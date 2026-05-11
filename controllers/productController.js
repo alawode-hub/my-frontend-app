@@ -1,4 +1,4 @@
-const Product = require("../models/product"); // make sure file is product.js lowercase
+const Product = require("../models/Product"); // make sure file is product.js lowercase
 
 // @desc    Get all products
 // @route   GET /api/products
