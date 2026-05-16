@@ -8,6 +8,8 @@ import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 import { Truck, Scissors, Tag } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URI;
+
 function Landing() {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -17,14 +19,15 @@ function Landing() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4000/api/products");
+        const { data } = await axios.get(`${API_URL}/api/products`);
         
         const selectedProducts = [
-  data.find(p => p.name.toLowerCase().includes("splatter")), // fixed
-  data.find(p => p.name.includes("Timberland 6")),
-  data.find(p => p.name.includes("Essentials Hoodie")),
-  data.find(p => p.name.includes("Fitted Cap - Black"))
-].filter(Boolean);
+          data.find(p => p.name.toLowerCase().includes("splatter")),
+          data.find(p => p.name.includes("Timberland 6")),
+          data.find(p => p.name.includes("Essentials Hoodie")),
+          data.find(p => p.name.includes("Fitted Cap - Black"))
+        ].filter(Boolean);
+        
         setFeaturedProducts(selectedProducts);
         setLoading(false);
       } catch (error) {
@@ -74,7 +77,7 @@ function Landing() {
       {/* HERO SECTION */}
       <section 
         style={{ 
-          backgroundImage: "url('http://localhost:4000/media/bg-street.jpg')",
+          backgroundImage: `url(${API_URL}/media/bg-street.jpg)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           minHeight: "80vh",
@@ -228,7 +231,7 @@ function Landing() {
                       flexShrink: 0
                     }}>
                       <img 
-                        src={`http://localhost:4000${product.image}`} 
+                        src={`${API_URL}${product.image}`} 
                         alt={product.name}
                         onError={(e) => {
                           e.target.src = "https://via.placeholder.com/400x400/1a1a/FF0000?text=MK";
