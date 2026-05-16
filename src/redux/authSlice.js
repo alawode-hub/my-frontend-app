@@ -1,6 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Use env variable. Add VITE_API_URI=https://mk-backend-1ues.onrender.com to Vercel
+const API_URL = import.meta.env.VITE_API_URI;
+
 // 1. REGISTER USER THUNK
 export const registerUser = createAsyncThunk(
   "auth/register",
@@ -9,7 +12,7 @@ export const registerUser = createAsyncThunk(
       const config = {
         headers: { "Content-Type": "application/json" },
       };
-      const { data } = await axios.post("http://localhost:4000/api/users/register", userData, config);
+      const { data } = await axios.post(`${API_URL}/api/users/register`, userData, config);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
@@ -26,7 +29,7 @@ export const loginUser = createAsyncThunk(
       const config = {
         headers: { "Content-Type": "application/json" },
       };
-      const { data } = await axios.post("http://localhost:4000/api/users/login", userData, config);
+      const { data } = await axios.post(`${API_URL}/api/users/login`, userData, config);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } catch (error) {
@@ -47,7 +50,7 @@ export const updateUserProfile = createAsyncThunk(
           Authorization: `Bearer ${auth.user.token}`,
         },
       };
-      const { data } = await axios.put("http://localhost:4000/api/users/profile", userData, config);
+      const { data } = await axios.put(`${API_URL}/api/users/profile`, userData, config);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
