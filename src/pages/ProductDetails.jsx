@@ -8,7 +8,7 @@ import { addToCart } from "../redux/cartSlice";
 import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
-const API_URL = import.meta.env.VITE_API_URI; // added this
+const API_URL = import.meta.env.VITE_API_URI;
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -25,11 +25,10 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/products/${id}`); // fixed here
+        const { data } = await axios.get(`${API_URL}/api/products/${id}`);
 
-        // Normalize: use stock if countInStock is missing
         const normalizedData = {
-         ...data,
+        ...data,
           price: Number(data.price) || 0,
           countInStock: Number(data.stock?? data.countInStock?? 0)
         };
@@ -169,7 +168,7 @@ const ProductDetails = () => {
             overflow: "hidden"
           }}>
             <img
-              src={product.image}
+              src={`${API_URL}${product.image}`}
               alt={product.name}
               style={{
                 width: "100%",
