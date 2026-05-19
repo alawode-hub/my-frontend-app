@@ -8,7 +8,7 @@ import { addToCart } from "../redux/cartSlice";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URI; // add this
+const API_URL = import.meta.env.VITE_API_URI;
 
 function Shop() {
   const location = useLocation();
@@ -46,7 +46,7 @@ function Shop() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/products`); // changed here
+        const { data } = await axios.get(`${API_URL}/api/products`);
         
         const normalized = data.map(p => ({
           ...p,
@@ -231,7 +231,7 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
       }}>
         <Link to={`/product/${product._id}`} state={{ fromCategory: activeCategory }}>
           <img
-            src={product.image}
+            src={`${API_URL}${product.image}`}
             alt={product.name}
             style={{
               width: "100%",

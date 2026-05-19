@@ -29,11 +29,11 @@ const ProductCard = ({ product, activeCategory }) => {
     >
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
         <div className="w-full h-64 bg-gray-100">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover object-center"
-          />
+         <img
+  src={`${import.meta.env.VITE_API_URI}${product.image}`}
+  alt={product.name}
+  className="w-full h-full object-cover object-center"
+/>
         </div>
 
         <div className="p-4">
