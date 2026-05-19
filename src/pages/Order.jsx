@@ -5,7 +5,9 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import toast, { Toaster } from "react-hot-toast";
+import { CLEAR_CART } from "../redux/cartSlice"; // added import
 
+const API_URL = import.meta.env.VITE_API_URI; // added this
 
 const Order = () => {
   const { user } = useSelector((state) => state.auth);
@@ -56,7 +58,7 @@ const Order = () => {
         isPaid: false,
       };
 
-      const { data } = await axios.post("http://localhost:4000/api/orders", orderData, config);
+      const { data } = await axios.post(`${API_URL}/api/orders`, orderData, config); // fixed here
       
       // Clear cart after successful order
       dispatch({ type: CLEAR_CART });
@@ -81,7 +83,7 @@ const Order = () => {
           CHECKOUT
         </h1>
 
-        {cart.cartItems.length === 0 ? (
+        {cart.cartItems.length === 0? (
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
             <p style={{ color: "#666", marginBottom: "1rem" }}>YOUR CART IS EMPTY.</p>
           </div>
@@ -99,7 +101,11 @@ const Order = () => {
                   paddingBottom: "1.5rem",
                   borderBottom: "1px solid #333"
                 }}>
-                  <img src={`http://localhost:4000${item.image}`} alt={item.name} style={{ width: "80px", height: "100px", objectFit: "cover" }} />
+                  <img 
+                    src={`${API_URL}${item.image}`} // fixed here
+                    alt={item.name} 
+                    style={{ width: "80px", height: "100px", objectFit: "cover" }} 
+                  />
                   <div style={{ flex: 1 }}>
                     <p style={{ fontWeight: "700", marginBottom: "0.5rem" }}>{item.name}</p>
                     <p style={{ color: "#999" }}>Qty: {item.qty} × ₦{item.price.toLocaleString()}</p>
@@ -132,18 +138,18 @@ const Order = () => {
                 onClick={placeOrderHandler}
                 disabled={loading}
                 style={{
-                  background: loading ? "#333" : "#FF0000",
+                  background: loading? "#333" : "#FF0000",
                   color: "#fff",
                   padding: "1rem",
                   border: "none",
                   fontWeight: "900",
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor: loading? "not-allowed" : "pointer",
                   width: "100%",
                   letterSpacing: "1px",
                   fontSize: "1rem"
                 }}
               >
-                {loading ? "PLACING ORDER..." : "PLACE ORDER"}
+                {loading? "PLACING ORDER..." : "PLACE ORDER"}
               </button>
             </div>
 

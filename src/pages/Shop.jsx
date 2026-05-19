@@ -8,6 +8,8 @@ import { addToCart } from "../redux/cartSlice";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URI; // add this
+
 function Shop() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ function Shop() {
 
   const categories = ["ALL PRODUCTS", "TOPS", "JEANS", "CAPS", "SNEAKERS", "HOODIES", "SHORTJEANS"];
 
-  // Sync URL + state on mount and when URL changes
   useEffect(() => {
     if (location.state?.activeCategory) {
       setActiveCategory(location.state.activeCategory);
@@ -34,7 +35,6 @@ function Shop() {
     }
   }, [categoryFromUrl, location.state]);
 
-  // Update URL when category changes
   useEffect(() => {
     if (activeCategory === "ALL PRODUCTS") {
       navigate("/shop", { replace: true });
@@ -46,9 +46,8 @@ function Shop() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4000/api/products");
+        const { data } = await axios.get(`${API_URL}/api/products`); // changed here
         
-        // Normalize stock fields so everything uses countInStock
         const normalized = data.map(p => ({
           ...p,
           countInStock: Number(p.stock ?? p.countInStock ?? 0)

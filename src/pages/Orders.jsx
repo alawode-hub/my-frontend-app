@@ -7,6 +7,8 @@ import Footer from "../components/Footer";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URI; // added this
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ const Orders = () => {
         const config = {
           headers: { Authorization: `Bearer ${user.token}` },
         };
-        const { data } = await axios.get("http://localhost:4000/api/orders/myorders", config);
+        const { data } = await axios.get(`${API_URL}/api/orders/myorders`, config); // fixed here
         setOrders(data);
         setLoading(false);
       } catch (error) {
@@ -35,10 +37,10 @@ const Orders = () => {
   if (loading) return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         height: "80vh",
         flexDirection: "column",
         gap: "1rem"
@@ -53,18 +55,18 @@ const Orders = () => {
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
       <Toaster position="top-center" duration={2500} />
-      
+
       <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "3rem 2rem" }}>
-        <h1 style={{ 
-          fontSize: "2rem", 
-          fontWeight: "900", 
+        <h1 style={{
+          fontSize: "2rem",
+          fontWeight: "900",
           marginBottom: "2rem",
           letterSpacing: "2px"
         }}>
           MY ORDERS
         </h1>
 
-        {orders.length === 0 ? (
+        {orders.length === 0? (
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
             <p style={{ color: "#666", marginBottom: "1rem" }}>YOU HAVE NO ORDERS YET.</p>
             <Link to="/shop" style={{
@@ -80,18 +82,18 @@ const Orders = () => {
           </div>
         ) : (
           orders.map((order) => (
-            <div key={order._id} style={{ 
-              border: "1px solid #333", 
-              padding: "1.5rem", 
+            <div key={order._id} style={{
+              border: "1px solid #333",
+              padding: "1.5rem",
               marginBottom: "2rem",
               background: "#111"
             }}>
               {/* ORDER HEADER */}
-              <div style={{ 
-                display: "flex", 
-                justifyContent: "space-between", 
-                marginBottom: "1.5rem", 
-                borderBottom: "1px solid #333", 
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "1.5rem",
+                borderBottom: "1px solid #333",
                 paddingBottom: "1rem",
                 flexWrap: "wrap",
                 gap: "1rem"
@@ -106,21 +108,21 @@ const Orders = () => {
                 </div>
                 <div>
                   <p style={{ fontSize: "0.75rem", color: "#666", marginBottom: "0.25rem" }}>STATUS</p>
-                  <p style={{ 
-                    fontWeight: "700", 
-                    color: order.isPaid ? "#16a34a" : "#FF0000",
+                  <p style={{
+                    fontWeight: "700",
+                    color: order.isPaid? "#16a34a" : "#FF0000",
                     letterSpacing: "1px"
                   }}>
-                    {order.isPaid ? "PAID" : "NOT PAID"}
+                    {order.isPaid? "PAID" : "NOT PAID"}
                   </p>
                 </div>
               </div>
 
               {/* ORDER ITEMS */}
               <div style={{ marginBottom: "1.5rem" }}>
-                <p style={{ 
-                  fontSize: "0.75rem", 
-                  fontWeight: "700", 
+                <p style={{
+                  fontSize: "0.75rem",
+                  fontWeight: "700",
                   letterSpacing: "1.5px",
                   marginBottom: "1rem",
                   color: "#999"
@@ -128,22 +130,22 @@ const Orders = () => {
                   ITEMS ORDERED
                 </p>
                 {order.orderItems.map((item) => (
-                  <div key={item._id} style={{ 
-                    display: "flex", 
-                    gap: "1rem", 
+                  <div key={item._id} style={{
+                    display: "flex",
+                    gap: "1rem",
                     marginBottom: "1rem",
                     paddingBottom: "1rem",
                     borderBottom: "1px solid #222"
                   }}>
-                    <img 
-                      src={`http://localhost:4000${item.image}`} 
-                      alt={item.name} 
-                      style={{ 
-                        width: "70px", 
-                        height: "90px", 
+                    <img
+                      src={`${API_URL}${item.image}`} // fixed here
+                      alt={item.name}
+                      style={{
+                        width: "70px",
+                        height: "90px",
                         objectFit: "cover",
                         background: "#0a0a0a"
-                      }} 
+                      }}
                     />
                     <div style={{ flex: 1 }}>
                       <p style={{ fontWeight: "600", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
@@ -163,9 +165,9 @@ const Orders = () => {
               </div>
 
               {/* ORDER TOTAL */}
-              <div style={{ 
-                borderTop: "2px solid #333", 
-                paddingTop: "1rem", 
+              <div style={{
+                borderTop: "2px solid #333",
+                paddingTop: "1rem",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center"

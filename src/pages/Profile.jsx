@@ -8,7 +8,9 @@ import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 
-// ORDERS LIST COMPONENT 
+const API_URL = import.meta.env.VITE_API_URI; // added this
+
+// ORDERS LIST COMPONENT
 const OrdersList = ({ user }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ const OrdersList = ({ user }) => {
         const config = {
           headers: { Authorization: `Bearer ${user.token}` },
         };
-        const { data } = await axios.get("http://localhost:4000/api/orders/myorders", config);
+        const { data } = await axios.get(`${API_URL}/api/orders/myorders`, config); // fixed here
         setOrders(data);
         setLoading(false);
       } catch (error) {
@@ -34,10 +36,10 @@ const OrdersList = ({ user }) => {
   }, [user]);
 
   if (loading) return (
-    <div style={{ 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
       padding: "4rem",
       flexDirection: "column",
       gap: "1rem"
@@ -66,18 +68,18 @@ const OrdersList = ({ user }) => {
   return (
     <>
       {orders.map((order) => (
-        <div key={order._id} style={{ 
-          border: "1px solid #333", 
-          padding: "1.5rem", 
+        <div key={order._id} style={{
+          border: "1px solid #333",
+          padding: "1.5rem",
           marginBottom: "2rem",
           background: "#111"
         }}>
           {/* ORDER HEADER */}
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
-            marginBottom: "1.5rem", 
-            borderBottom: "1px solid #333", 
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "1.5rem",
+            borderBottom: "1px solid #333",
             paddingBottom: "1rem",
             flexWrap: "wrap",
             gap: "1rem"
@@ -92,21 +94,21 @@ const OrdersList = ({ user }) => {
             </div>
             <div>
               <p style={{ fontSize: "0.75rem", color: "#666", marginBottom: "0.25rem" }}>STATUS</p>
-              <p style={{ 
-                fontWeight: "700", 
-                color: order.isPaid ? "#16a34a" : "#FF0000",
+              <p style={{
+                fontWeight: "700",
+                color: order.isPaid? "#16a34a" : "#FF0000",
                 letterSpacing: "1px"
               }}>
-                {order.isPaid ? "PAID" : "NOT PAID"}
+                {order.isPaid? "PAID" : "NOT PAID"}
               </p>
             </div>
           </div>
 
           {/* ORDER ITEMS */}
           <div style={{ marginBottom: "1.5rem" }}>
-            <p style={{ 
-              fontSize: "0.75rem", 
-              fontWeight: "700", 
+            <p style={{
+              fontSize: "0.75rem",
+              fontWeight: "700",
               letterSpacing: "1.5px",
               marginBottom: "1rem",
               color: "#999"
@@ -114,22 +116,22 @@ const OrdersList = ({ user }) => {
               ITEMS ORDERED
             </p>
             {order.orderItems.map((item) => (
-              <div key={item._id} style={{ 
-                display: "flex", 
-                gap: "1rem", 
+              <div key={item._id} style={{
+                display: "flex",
+                gap: "1rem",
                 marginBottom: "1rem",
                 paddingBottom: "1rem",
                 borderBottom: "1px solid #222"
               }}>
-                <img 
-                  src={`http://localhost:4000${item.image}`} 
-                  alt={item.name} 
-                  style={{ 
-                    width: "70px", 
-                    height: "90px", 
+                <img
+                  src={`${API_URL}${item.image}`} // fixed here
+                  alt={item.name}
+                  style={{
+                    width: "70px",
+                    height: "90px",
                     objectFit: "cover",
                     background: "#0a0a0a"
-                  }} 
+                  }}
                 />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: "600", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
@@ -149,9 +151,9 @@ const OrdersList = ({ user }) => {
           </div>
 
           {/* ORDER TOTAL */}
-          <div style={{ 
-            borderTop: "2px solid #333", 
-            paddingTop: "1rem", 
+          <div style={{
+            borderTop: "2px solid #333",
+            paddingTop: "1rem",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center"
@@ -208,19 +210,19 @@ const Profile = () => {
   }, [user, navigate]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({...formData, [e.target.name]: e.target.value });
   };
 
   const handleUpdateDetails = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await dispatch(updateUserProfile({ 
-        firstName: formData.firstName, 
-        lastName: formData.lastName, 
-        email: formData.email 
+      await dispatch(updateUserProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email
       })).unwrap();
-      
+
       toast.success("PROFILE UPDATED", {
         style: { background: '#111', color: '#fff', border: '1px solid #FF0000', fontWeight: '700', letterSpacing: '1px' }
       });
@@ -235,7 +237,7 @@ const Profile = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (formData.newPassword !== formData.confirmPassword) {
+    if (formData.newPassword!== formData.confirmPassword) {
       toast.error("PASSWORDS DON'T MATCH", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
@@ -247,7 +249,7 @@ const Profile = () => {
       toast.success("PASSWORD CHANGED", {
         style: { background: '#111', color: '#fff', border: '1px solid #FF0000', fontWeight: '700', letterSpacing: '1px' }
       });
-      setFormData({ ...formData, currentPassword: "", newPassword: "", confirmPassword: "" });
+      setFormData({...formData, currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (error) {
       toast.error(error || "PASSWORD CHANGE FAILED", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
@@ -260,7 +262,7 @@ const Profile = () => {
   if (!user) return null;
 
   const EyeIcon = ({ show }) => (
-    show ? (
+    show? (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
         <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -277,9 +279,9 @@ const Profile = () => {
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
       <Toaster position="top-center" duration={2500} />
-      
+
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem 2rem" }}>
-        
+
         {/* HEADER */}
         <h1 style={{
           fontSize: "2rem",
@@ -310,17 +312,17 @@ const Profile = () => {
               style={{
                 background: "transparent",
                 border: "none",
-                color: activeTab === tab ? "#fff" : "#666",
+                color: activeTab === tab? "#fff" : "#666",
                 fontSize: "0.75rem",
                 fontWeight: "700",
                 letterSpacing: "1.5px",
                 cursor: "pointer",
                 paddingBottom: "1rem",
-                borderBottom: activeTab === tab ? "2px solid #FF0000" : "2px solid transparent",
+                borderBottom: activeTab === tab? "2px solid #FF0000" : "2px solid transparent",
                 textTransform: "uppercase"
               }}
             >
-              {tab === "details" ? "Profile Details" : tab === "orders" ? "My Orders" : "Change Password"}
+              {tab === "details"? "Profile Details" : tab === "orders"? "My Orders" : "Change Password"}
             </button>
           ))}
         </div>
@@ -329,7 +331,7 @@ const Profile = () => {
         {activeTab === "details" && (
           <div style={{ maxWidth: "600px" }}>
             <form onSubmit={handleUpdateDetails}>
-              
+
               {/* FIRST NAME */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
@@ -426,7 +428,7 @@ const Profile = () => {
                   fontSize: "0.85rem",
                   fontWeight: "700",
                   letterSpacing: "1.5px",
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor: loading? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -434,7 +436,7 @@ const Profile = () => {
                   marginTop: "1rem"
                 }}
               >
-                {loading ? <ClipLoader color="#fff" size={20} /> : "UPDATE PROFILE"}
+                {loading? <ClipLoader color="#fff" size={20} /> : "UPDATE PROFILE"}
               </button>
             </form>
           </div>
@@ -451,7 +453,7 @@ const Profile = () => {
         {activeTab === "password" && (
           <div style={{ maxWidth: "600px" }}>
             <form onSubmit={handleChangePassword}>
-              
+
               {/* CURRENT PASSWORD */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
@@ -466,7 +468,7 @@ const Profile = () => {
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
-                    type={showCurrentPassword ? "text" : "password"}
+                    type={showCurrentPassword? "text" : "password"}
                     name="currentPassword"
                     value={formData.currentPassword}
                     onChange={handleChange}
@@ -516,7 +518,7 @@ const Profile = () => {
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
-                    type={showNewPassword ? "text" : "password"}
+                    type={showNewPassword? "text" : "password"}
                     name="newPassword"
                     value={formData.newPassword}
                     onChange={handleChange}
@@ -566,7 +568,7 @@ const Profile = () => {
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
-                    type={showConfirmPassword ? "text" : "password"}
+                    type={showConfirmPassword? "text" : "password"}
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
@@ -614,7 +616,7 @@ const Profile = () => {
                   fontSize: "0.85rem",
                   fontWeight: "700",
                   letterSpacing: "1.5px",
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor: loading? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -622,7 +624,7 @@ const Profile = () => {
                   marginTop: "1rem"
                 }}
               >
-                {loading ? <ClipLoader color="#fff" size={20} /> : "CHANGE PASSWORD"}
+                {loading? <ClipLoader color="#fff" size={20} /> : "CHANGE PASSWORD"}
               </button>
             </form>
           </div>

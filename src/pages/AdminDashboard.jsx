@@ -7,6 +7,8 @@ import API from "../services/api";
 import { ClipLoader } from "react-spinners";
 import { Toaster, toast } from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URI; // added this
+
 function Admin() {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -97,8 +99,8 @@ function Admin() {
     try {
       const { data } = await API.post('/upload', formData);
       const imageUrl = data.startsWith('http')
-       ? data
-        : `http://localhost:4000${data}`;
+      ? data
+        : `${API_URL}${data}`; // fixed here
       setForm({...form, image: imageUrl });
       toast.dismiss(toastId);
       toast.success("IMAGE UPLOADED ✅");
@@ -164,7 +166,7 @@ function Admin() {
 
     try {
       const productData = {
-       ...form,
+      ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -184,6 +186,7 @@ function Admin() {
     } catch (err) {
       toast.dismiss(toastId);
       toast.error(err.response?.data?.message || "ERROR SAVING PRODUCT");
+      console.error(err);
     } finally {
       setSubmitting(false);
     }

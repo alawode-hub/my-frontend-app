@@ -8,6 +8,8 @@ import { addToCart } from "../redux/cartSlice";
 import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
+const API_URL = import.meta.env.VITE_API_URI; // added this
+
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:4000/api/products/${id}`);
+        const { data } = await axios.get(`${API_URL}/api/products/${id}`); // fixed here
 
         // Normalize: use stock if countInStock is missing
         const normalizedData = {
