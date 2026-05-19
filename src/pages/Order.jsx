@@ -5,7 +5,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import toast, { Toaster } from "react-hot-toast";
-import { CLEAR_CART } from "../redux/cartSlice"; // added import
+import { clearCart } from "../redux/cartSlice"; // added import
 
 const API_URL = import.meta.env.VITE_API_URI; // added this
 
@@ -61,7 +61,7 @@ const Order = () => {
       const { data } = await axios.post(`${API_URL}/api/orders`, orderData, config); // fixed here
       
       // Clear cart after successful order
-      dispatch({ type: CLEAR_CART });
+      dispatch(clearCart());
       localStorage.removeItem('cartItems');
       
       toast.success("ORDER PLACED SUCCESSFULLY 🔥");
