@@ -7,6 +7,8 @@ import Footer from "../components/Footer";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URI;
+
 const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -145,7 +147,11 @@ const Cart = () => {
                     }}>
                       
                       <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                        <img src={item.image} alt={item.name} style={{ width: "80px", height: "100px", objectFit: "cover", background: "#111" }} />
+                        <img 
+                          src={`${API_URL}${item.image}`} 
+                          alt={item.name} 
+                          style={{ width: "80px", height: "100px", objectFit: "cover", background: "#111" }} 
+                        />
                         <div>
                           <h3 style={{ fontSize: "0.9rem", fontWeight: "600", marginBottom: "0.25rem", textTransform: "uppercase" }}>
                             <Link to={`/product/${item._id}`} style={{ color: "#fff", textDecoration: "none" }}>
