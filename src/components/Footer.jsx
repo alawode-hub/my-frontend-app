@@ -8,7 +8,7 @@ const Footer = () => {
         <div>
           <h4>MK COLLECTIVES</h4>
           <p>
-            Confident, rebellious streetwear with a touch of luxury. 
+            Confident, rebellious streetwear with a touch of luxury.
             For the city kid who treats fits like a craft.
           </p>
         </div>
@@ -27,41 +27,25 @@ const Footer = () => {
           </ul>
         </div>
 
-      
-
-        {/* COLUMN 4: CONNECT */}
+        {/* COLUMN 3: CONNECT */}
         <div>
           <h4>CONNECT</h4>
           <ul>
             <li>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
                 Instagram
               </a>
             </li>
             <li>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
                 Twitter
               </a>
             </li>
             <li>
-              <a 
-                href="https://tiktok.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
+              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer">
                 TikTok
               </a>
             </li>
-            <li>
-                      </li>
           </ul>
         </div>
       </div>

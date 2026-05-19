@@ -37,10 +37,9 @@ const Navbar = () => {
         background: "#000",
         color: "#fff",
         height: "56px",
-        minHeight: "56px",
-        maxHeight: "56px",
+        width: "100%",
+        maxWidth: "100vw",
         padding: "0 16px",
-        margin: 0,
         position: "fixed",
         top: 0,
         left: 0,
@@ -51,8 +50,9 @@ const Navbar = () => {
         justifyContent: "space-between",
         borderBottom: "1px solid #1a1a1a",
         boxSizing: "border-box",
-        lineHeight: "1"
+        overflowX: "hidden"
       }}>
+
         {/* Hamburger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -62,40 +62,34 @@ const Navbar = () => {
             color: "#fff",
             cursor: "pointer",
             padding: "8px",
-            margin: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            lineHeight: "1"
+            flexShrink: 0
           }}
         >
           <FaBars size={18} />
         </button>
 
-        {/* CENTER: TEXT LOGO - NIKE/ZARA STYLE */}
+        {/* CENTER LOGO */}
         <Link
           to="/"
           onClick={closeMenu}
           style={{
-            position: "absolute",
-            left: "50%",
-            transform: "translateX(-50%)",
             color: "#fff",
             textDecoration: "none",
             fontSize: "16px",
             fontWeight: "700",
             letterSpacing: "2px",
             textTransform: "uppercase",
-            display: "flex",
-            alignItems: "center",
-            height: "56px"
+            whiteSpace: "nowrap"
           }}
         >
           MK COLLECTIVES
         </Link>
 
         {/* RIGHT: Profile + Cart */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
           {user && (
             <Link
               to="/profile"
@@ -110,13 +104,11 @@ const Navbar = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "8px",
-                margin: 0,
-                lineHeight: "1"
+                padding: "8px"
               }}
             >
               <FaUser size={14} />
-              HI, {user.name?.split(" ")[0].toUpperCase()}
+              <span className="nav-username">HI, {user.name?.split(" ")[0].toUpperCase()}</span>
             </Link>
           )}
 
@@ -129,9 +121,7 @@ const Navbar = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "8px",
-              margin: 0,
-              lineHeight: "1"
+              padding: "8px"
             }}
           >
             <FaShoppingCart size={18} />
@@ -150,8 +140,7 @@ const Navbar = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "700",
-                padding: "0 4px",
-                lineHeight: "1"
+                padding: "0 4px"
               }}>
                 {cartCount}
               </span>
@@ -180,11 +169,13 @@ const Navbar = () => {
         left: 0,
         height: "100vh",
         width: "280px",
+        maxWidth: "80vw",
         background: "#000",
         zIndex: 10000,
         transform: menuOpen? "translateX(0)" : "translateX(-100%)",
         transition: "transform 0.25s ease",
-        borderRight: "1px solid #1a1a1a"
+        borderRight: "1px solid #1a1a1a",
+        overflowY: "auto"
       }}>
         <div style={{
           display: "flex",
@@ -203,8 +194,7 @@ const Navbar = () => {
               alignItems: "center",
               justifyContent: "center",
               width: "32px",
-              height: "32px",
-              lineHeight: "1"
+              height: "32px"
             }}
           >
             <FaTimes size={14} />
@@ -218,123 +208,49 @@ const Navbar = () => {
           gap: "32px",
           marginTop: "16px"
         }}>
-          <Link
-            to="/"
-            onClick={closeMenu}
-            style={{
-              color: "#fff",
-              textDecoration: "none",
-              fontSize: "13px",
-              fontWeight: "400",
-              textTransform: "uppercase",
-              lineHeight: "1"
-            }}
-          >
-            HOME
-          </Link>
-
-          <Link
-            to="/shop"
-            onClick={handleShopClick}
-            style={{
-              color: "#fff",
-              textDecoration: "none",
-              fontSize: "13px",
-              fontWeight: "400",
-              textTransform: "uppercase",
-              lineHeight: "1"
-            }}
-          >
-            SHOP
-          </Link>
+          <Link to="/" onClick={closeMenu} style={navLinkStyle}>HOME</Link>
+          <Link to="/shop" onClick={handleShopClick} style={navLinkStyle}>SHOP</Link>
 
           {user? (
             <>
-              <Link
-                to="/profile"
-                onClick={closeMenu}
-                style={{
-                  color: "#fff",
-                  textDecoration: "none",
-                  fontSize: "13px",
-                  fontWeight: "400",
-                  textTransform: "uppercase",
-                  lineHeight: "1"
-                }}
-              >
-                PROFILE
-              </Link>
-
+              <Link to="/profile" onClick={closeMenu} style={navLinkStyle}>PROFILE</Link>
               {user.role === "admin" && (
-                <Link
-                  to="/admin"
-                  onClick={closeMenu}
-                  style={{
-                    color: "#fff",
-                    textDecoration: "none",
-                    fontSize: "13px",
-                    fontWeight: "400",
-                    textTransform: "uppercase",
-                    lineHeight: "1"
-                  }}
-                >
-                  ADMIN
-                </Link>
+                <Link to="/admin" onClick={closeMenu} style={navLinkStyle}>ADMIN</Link>
               )}
-              <button
-                onClick={handleLogout}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "#FF0000",
-                  textAlign: "left",
-                  fontSize: "13px",
-                  fontWeight: "400",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                  padding: 0,
-                  lineHeight: "1"
-                }}
-              >
-                LOGOUT
-              </button>
+              <button onClick={handleLogout} style={logoutBtnStyle}>LOGOUT</button>
             </>
           ) : (
             <>
-              <Link
-                to="/login"
-                onClick={closeMenu}
-                style={{
-                  color: "#fff",
-                  textDecoration: "none",
-                  fontSize: "13px",
-                  fontWeight: "400",
-                  textTransform: "uppercase",
-                  lineHeight: "1"
-                }}
-              >
-                LOGIN
-              </Link>
-              <Link
-                to="/register"
-                onClick={closeMenu}
-                style={{
-                  color: "#fff",
-                  textDecoration: "none",
-                  fontSize: "13px",
-                  fontWeight: "400",
-                  textTransform: "uppercase",
-                  lineHeight: "1"
-                }}
-              >
-                REGISTER
-              </Link>
+              <Link to="/login" onClick={closeMenu} style={navLinkStyle}>LOGIN</Link>
+              <Link to="/register" onClick={closeMenu} style={navLinkStyle}>REGISTER</Link>
             </>
           )}
         </div>
       </div>
     </>
   );
+};
+
+const navLinkStyle = {
+  color: "#fff",
+  textDecoration: "none",
+  fontSize: "13px",
+  fontWeight: "400",
+  textTransform: "uppercase",
+  lineHeight: "1"
+};
+
+const logoutBtnStyle = {
+  background: "transparent",
+  border: "none",
+  color: "#FF0000",
+  textAlign: "left",
+  fontSize: "13px",
+  fontWeight: "400",
+  textTransform: "uppercase",
+  cursor: "pointer",
+  padding: 0,
+  lineHeight: "1"
 };
 
 export default Navbar;
