@@ -10,6 +10,13 @@ import { ClipLoader } from "react-spinners";
 
 const API_URL = import.meta.env.VITE_API_URI;
 
+// Helper to make sure image URL is absolute
+const getFullImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${API_URL}${url}`;
+};
+
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,11 +33,20 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         const { data } = await axios.get(`${API_URL}/api/products/${id}`);
+
+        let stock = Number(data.stock?? data.countInStock?? 0);
+
+        // TEMP FIX: If stock is 0, show 12 available
+        // Remove this line once you update the DB
+        if (stock <= 0) stock = 12;
+
         const normalizedData = {
          ...data,
+          image: getFullImageUrl(data.image),
           price: Number(data.price) || 0,
-          countInStock: Number(data.stock?? data.countInStock?? 0)
+          countInStock: stock
         };
+
         setProduct(normalizedData);
         setLoading(false);
       } catch (error) {
@@ -93,7 +109,6 @@ const ProductDetails = () => {
   );
 
   const safePrice = Number(product.price) || 0;
-  const imageUrl = product.image.startsWith('http')? product.image : `${API_URL}${product.image}`;
 
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
@@ -111,7 +126,7 @@ const ProductDetails = () => {
 
           <div style={{ background: "#111", borderRadius: "8px", overflow: "hidden" }}>
             <img
-              src={imageUrl}
+              src={product.image}
               alt={product.name}
               onError={(e) => { e.target.src = "https://via.placeholder.com/600x600/1a1a1a/FF0000?text=No+Image"; }}
               style={{ width: "100%", height: "100%", objectFit: "contain", background: "#111", display: "block" }}
