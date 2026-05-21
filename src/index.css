@@ -34,7 +34,7 @@ a {
 
 /* HERO SECTION */
 .hero-section {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,11 +100,35 @@ a {
   color: #fff;
 }
 
+/* LANDING SECTION FOR 4 IMAGES */
+.landing-collection {
+  padding: 4rem 0;
+  background: #0a0a0a;
+}
+
+.landing-collection h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.landing-collection .underline {
+  width: 40px;
+  height: 3px;
+  background: #FF0000;
+  margin: 0 auto 2.5rem auto;
+}
+
 /* PRODUCT GRID */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 .product-card {
@@ -118,7 +142,7 @@ a {
   width: 100%;
   height: 320px;
   object-fit: cover;
-  object-position: center; /* Centers image so face no cut */
+  object-position: center;
   display: block;
   transition: transform 0.4s ease;
   background-color: #1a1a1a;
@@ -295,7 +319,6 @@ a {
   gap: 24px;
 }
 
-
 /* PRODUCT DETAILS */
 .product-detail-layout {
   display: grid;
@@ -337,7 +360,7 @@ a {
 .feature-item p {
   color: #888;
   font-size: 0.95rem;
-  line-height: 1.7; /* Fixed: was fontSize/lineHeight */
+  line-height: 1.7;
 }
 
 /* ================= MOBILE RESPONSIVE ================= */
@@ -347,6 +370,7 @@ a {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
+    padding: 0 1.5rem;
   }
   
   .product-card img {
@@ -356,6 +380,10 @@ a {
 
 /* Mobile */
 @media (max-width: 768px) {
+  .hero-section {
+    background-attachment: scroll;
+  }
+
   .cart-layout {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -415,10 +443,11 @@ a {
   .product-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0 1rem;
   }
   
   .product-card img {
-    height: 240px;
+    height: 280px;
   }
 }
 
@@ -434,7 +463,7 @@ a {
   }
 
   .auth-box input {
-    font-size: 16px; /* Stops iOS zoom */
+    font-size: 16px;
     padding: 12px;
   }
 
