@@ -281,6 +281,7 @@ a {
   transition: color 0.2s;
   position: relative;
   display: inline-block;
+  padding-bottom: 8px; /* creates space under text */
 }
 
 .mk-footer a:hover {
@@ -292,10 +293,10 @@ a {
   position: absolute;
   width: 0;
   height: 2px;
-  bottom: -3px;
+  bottom: 0; /* line sits at bottom of padding */
   left: 0;
   background-color: #FF0000;
-  transition: width 0.3s ease;
+  transition: width 0.25s ease;
 }
 
 .mk-footer a:hover::after {
