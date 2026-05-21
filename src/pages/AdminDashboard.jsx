@@ -60,7 +60,7 @@ function Admin() {
 
       // Fix image URLs for products
       const fixedProducts = productsRes.data.map(p => ({
-       ...p,
+      ...p,
         image: getFullImageUrl(p.image)
       }));
 
@@ -178,7 +178,7 @@ function Admin() {
 
     try {
       const productData = {
-       ...form,
+      ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -220,8 +220,6 @@ function Admin() {
       }
     });
   };
-
-  const totalRevenue = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
 
   if (loading) return (
     <div className="page-dark">
@@ -308,10 +306,6 @@ function Admin() {
           <div className="stat-box" style={{ background: '#111', border: '1px solid #333', padding: '1.5rem', borderRadius: '8px' }}>
             <h3 style={{ fontSize: '2rem', margin: 0 }}>{orders.length}</h3>
             <p style={{ color: '#777', margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>TOTAL ORDERS</p>
-          </div>
-          <div className="stat-box" style={{ background: '#111', border: '1px solid #333', padding: '1.5rem', borderRadius: '8px' }}>
-            <h3 style={{ fontSize: '2rem', margin: 0 }}>₦{totalRevenue.toLocaleString()}</h3>
-            <p style={{ color: '#777', margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>TOTAL REVENUE</p>
           </div>
         </div>
 
@@ -473,5 +467,3 @@ function Admin() {
 }
 
 export default Admin;
-
-//is total revenue means total amt of products i have in total abi like the total price right
