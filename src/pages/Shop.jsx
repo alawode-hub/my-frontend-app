@@ -174,7 +174,14 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
     <div className="product-card" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
         <Link to={`/product/${product._id}`} state={{ fromCategory: activeCategory }}>
-          <img src={`${API_URL}${product.image}`} alt={product.name} style={{ transform: isHovered ? "scale(1.05)" : "scale(1)" }} />
+         <img 
+  src={`${API_URL}${product.image}`} 
+  alt={product.name} 
+  style={{ 
+    transform: isHovered ? "scale(1.05)" : "scale(1)",
+    objectPosition: "center" 
+  }} 
+/>
         </Link>
 
         <div

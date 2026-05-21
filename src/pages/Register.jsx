@@ -113,21 +113,28 @@ const Register = () => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
-          <button 
-            type="submit" 
-            className="btn-white" 
-            disabled={loading}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
-          >
-            {loading ? (
-              <>
-                <ClipLoader size={18} color="#000" />
-                CREATING ACCOUNT...
-              </>
-            ) : (
-              "REGISTER"
-            )}
-          </button>
+        <button 
+  type="submit" 
+  className="btn-white" 
+  disabled={loading}
+  style={{ 
+    width: '100%',
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: '10px' 
+  }}
+>
+  {loading ? (
+    <>
+      <ClipLoader size={18} color="#000" />
+      CREATING ACCOUNT...
+    </>
+  ) : (
+    "REGISTER"
+  )}
+</button>
+
         </form>
         <p className="auth-link">
           Already have an account? <Link to="/login">Login</Link>

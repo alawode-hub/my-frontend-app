@@ -422,3 +422,67 @@ a {
   object-position: center;
   display: block;
 }
+
+/* MOBILE FIXES FOR AUTH PAGES */
+@media (max-width: 480px) {
+  .auth-box {
+    padding: 25px 20px;
+    margin: 0 16px;
+  }
+
+  .auth-box h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .auth-box input {
+    font-size: 16px; /* Stops iOS zoom */
+    padding: 12px;
+  }
+
+  .auth-box .btn-white {
+    width: 100%;
+    padding: 14px;
+    font-size: 13px;
+  }
+
+  .auth-link {
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
+/* Shop product image fix */
+.product-card img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  object-position: center; /* Centers the image so face no cut */
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .product-card img {
+    height: 240px;
+  }
+}
+
+/* Hide username on very small screens */
+@media (max-width: 360px) {
+  .nav-username {
+    display: none;
+  }
+}
+
+/* Make sure auth link has style */
+.auth-link {
+  margin-top: 16px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.auth-link a {
+  color: #FF0000;
+  font-weight: 700;
+}

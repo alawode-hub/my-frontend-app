@@ -104,20 +104,27 @@ const Login = () => {
             </span>
           </div>
           <button 
-            type="submit" 
-            className="btn-white" 
-            disabled={loading}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
-          >
-            {loading ? (
-              <>
-                <ClipLoader size={18} color="#000" />
-                LOGGING IN...
-              </>
-            ) : (
-              "LOGIN"
-            )}
-          </button>
+  type="submit" 
+  className="btn-white" 
+  disabled={loading}
+  style={{ 
+    width: '100%',
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: '10px' 
+  }}
+>
+  {loading ? (
+    <>
+      <ClipLoader size={18} color="#000" />
+      LOGGING IN...
+    </>
+  ) : (
+    "LOGIN"
+  )}
+</button>
+
         </form>
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register</Link>
