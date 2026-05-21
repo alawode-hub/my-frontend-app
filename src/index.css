@@ -100,7 +100,7 @@ a {
   color: #fff;
 }
 
-/* PRODUCT GRID - RESPONSIVE */
+/* PRODUCT GRID */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -118,6 +118,7 @@ a {
   width: 100%;
   height: 320px;
   object-fit: cover;
+  object-position: center; /* Centers image so face no cut */
   display: block;
   transition: transform 0.4s ease;
   background-color: #1a1a1a;
@@ -140,7 +141,7 @@ a {
   font-size: 14px;
 }
 
-/* CART LAYOUT - RESPONSIVE */
+/* CART LAYOUT */
 .cart-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -155,7 +156,7 @@ a {
   gap: 1rem;
 }
 
-/* FILTER TABS - SCROLLABLE ON MOBILE */
+/* FILTER TABS */
 .filter-tabs {
   display: flex;
   justify-content: center;
@@ -196,6 +197,18 @@ a {
   border: 1px solid #333;
   color: #fff;
   font-size: 14px;
+}
+
+.auth-link {
+  margin-top: 16px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.auth-link a {
+  color: #FF0000;
+  font-weight: 700;
 }
 
 /* FOOTER */
@@ -265,6 +278,50 @@ a {
   gap: 24px;
 }
 
+/* PRODUCT DETAILS */
+.product-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rem;
+}
+
+.feature-item {
+  text-align: center;
+}
+
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #FF0000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem auto;
+}
+
+.feature-item h3 {
+  color: #fff;
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.feature-item p {
+  color: #888;
+  font-size: 0.95rem;
+  line-height: 1.7; /* Fixed: was fontSize/lineHeight */
+}
+
 /* ================= MOBILE RESPONSIVE ================= */
 
 /* Tablet */
@@ -320,6 +377,20 @@ a {
     text-align: center;
     gap: 16px;
   }
+  
+  .product-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
 }
 
 @media (max-width: 600px) {
@@ -333,97 +404,6 @@ a {
   }
 }
 
-@media (max-width: 480px) {
-  .auth-box {
-    padding: 25px 20px;
-    margin: 0 1rem;
-  }
-  
-  .auth-box input {
-    font-size: 16px; /* Prevents iOS zoom */
-  }
-  
-  .hero-content h1 {
-    font-size: clamp(2rem, 10vw, 3rem);
-  }
-}
-
-@media (max-width: 360px) {
-  .nav-username {
-    display: none;
-  }
-}
-
-/* Product Details Layout */
-.product-detail-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 3rem;
-  align-items: start;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4rem;
-}
-
-.feature-item {
-  text-align: center;
-}
-
-.feature-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #FF0000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 2rem auto;
-}
-
-.feature-item h3 {
-  color: #fff;
-  font-size: 1.25rem;
-  letter-spacing: 2px;
-  margin-bottom: 1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.feature-item p {
-  color: #888;
-  fontSize: 0.95rem;
-  lineHeight: 1.7;
-}
-
-/* Mobile fixes */
-@media (max-width: 768px) {
- .product-detail-layout {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
- .features-grid {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-
- .hero-content h1 {
-    font-size: clamp(2rem, 10vw, 3rem);
-  }
-}
-
-.product-card img {
-  width: 100%;
-  height: 320px;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-/* MOBILE FIXES FOR AUTH PAGES */
 @media (max-width: 480px) {
   .auth-box {
     padding: 25px 20px;
@@ -448,41 +428,11 @@ a {
 
   .auth-link {
     font-size: 13px;
-    text-align: center;
   }
 }
 
-/* Shop product image fix */
-.product-card img {
-  width: 100%;
-  height: 320px;
-  object-fit: cover;
-  object-position: center; /* Centers the image so face no cut */
-  display: block;
-}
-
-@media (max-width: 600px) {
-  .product-card img {
-    height: 240px;
-  }
-}
-
-/* Hide username on very small screens */
 @media (max-width: 360px) {
   .nav-username {
     display: none;
   }
-}
-
-/* Make sure auth link has style */
-.auth-link {
-  margin-top: 16px;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-}
-
-.auth-link a {
-  color: #FF0000;
-  font-weight: 700;
 }
