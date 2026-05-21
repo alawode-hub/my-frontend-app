@@ -10,6 +10,13 @@ import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URI;
 
+// Helper to make sure image URL is absolute
+const getFullImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${API_URL}${url}`;
+};
+
 function Shop() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,6 +56,7 @@ function Shop() {
         const { data } = await axios.get(`${API_URL}/api/products`);
         const normalized = data.map(p => ({
           ...p,
+          image: getFullImageUrl(p.image), // FIX HERE
           countInStock: Number(p.stock ?? p.countInStock ?? 0)
         }));
         setProducts(normalized);
@@ -174,14 +182,19 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
     <div className="product-card" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
         <Link to={`/product/${product._id}`} state={{ fromCategory: activeCategory }}>
-         <img 
-  src={`${API_URL}${product.image}`} 
-  alt={product.name} 
-  style={{ 
-    transform: isHovered ? "scale(1.05)" : "scale(1)",
-    objectPosition: "center" 
-  }} 
-/>
+          <img 
+            src={product.image} // CHANGED: use product.image directly
+            alt={product.name} 
+            style={{ 
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transform: isHovered ? "scale(1.05)" : "scale(1)",
+              objectPosition: "center",
+              transition: "transform 0.4s ease"
+            }} 
+            onError={(e) => e.target.style.display = 'none'}
+          />
         </Link>
 
         <div
@@ -199,7 +212,8 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
             fontWeight: "700",
             letterSpacing: "1.5px",
             transform: isHovered ? "translateY(0)" : "translateY(100%)",
-            transition: "transform 0.3s ease"
+            transition: "transform 0.3s ease",
+            cursor: "pointer"
           }}
         >
           {addedItems[product._id] ? 'ADDED ✓' : 'ADD TO CART'}
