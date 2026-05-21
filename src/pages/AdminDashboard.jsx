@@ -7,7 +7,7 @@ import API from "../services/api";
 import { ClipLoader } from "react-spinners";
 import { Toaster, toast } from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URI; // added this
+const API_URL = import.meta.env.VITE_API_URI;
 
 function Admin() {
   const { user } = useSelector((state) => state.auth);
@@ -43,6 +43,13 @@ function Admin() {
     fetchData();
   }, [user, navigate]);
 
+  // Helper to make sure image URL is absolute
+  const getFullImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `${API_URL}${url}`;
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -50,7 +57,14 @@ function Admin() {
         API.get("/products"),
         API.get("/orders")
       ]);
-      setProducts(productsRes.data);
+
+      // Fix image URLs for products
+      const fixedProducts = productsRes.data.map(p => ({
+       ...p,
+        image: getFullImageUrl(p.image)
+      }));
+
+      setProducts(fixedProducts);
       setOrders(ordersRes.data);
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
@@ -98,9 +112,7 @@ function Admin() {
 
     try {
       const { data } = await API.post('/upload', formData);
-      const imageUrl = data.startsWith('http')
-      ? data
-        : `${API_URL}${data}`; // fixed here
+      const imageUrl = data.startsWith('http')? data : `${API_URL}${data}`;
       setForm({...form, image: imageUrl });
       toast.dismiss(toastId);
       toast.success("IMAGE UPLOADED ✅");
@@ -166,7 +178,7 @@ function Admin() {
 
     try {
       const productData = {
-      ...form,
+       ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -404,7 +416,12 @@ function Admin() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {products.map((product) => (
                   <div key={product._id} style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', background: '#1a1a1a', borderRadius: '4px' }}>
-                    <img src={product.image} alt={product.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
+                      onError={(e) => e.target.style.display = 'none'}
+                    />
                     <div style={{ flex: 1 }}>
                       <h4 style={{ margin: '0 0 0.5rem 0' }}>{product.name}</h4>
                       <p style={{ margin: 0, color: '#777' }}>₦{product.price.toLocaleString()}</p>
@@ -456,3 +473,5 @@ function Admin() {
 }
 
 export default Admin;
+
+//is total revenue means total amt of products i have in total abi like the total price right
