@@ -17,6 +17,13 @@ const Cart = () => {
   const [confirmAction, setConfirmAction] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Helper for image URL
+  const getFullImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `${API_URL}${url}`;
+  };
+
   const handleRemove = (id) => {
     setConfirmAction({
       text: "Remove this item from cart?",
@@ -115,7 +122,13 @@ const Cart = () => {
                     <div key={item._id} className="cart-item-grid">
                       
                       <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                        <img src={`${API_URL}${item.image}`} alt={item.name} style={{ width: "80px", height: "100px", objectFit: "cover", background: "#111" }} />
+                        <img 
+                          src={getFullImageUrl(item.image)} 
+                          alt={item.name} 
+                          loading="lazy"
+                          onError={(e) => e.target.style.display = 'none'}
+                          style={{ width: "80px", height: "100px", objectFit: "cover", background: "#111" }} 
+                        />
                         <div>
                           <h3 style={{ fontSize: "0.9rem", fontWeight: "600", marginBottom: "0.25rem", textTransform: "uppercase" }}>
                             <Link to={`/product/${item._id}`} style={{ color: "#fff", textDecoration: "none" }}>{item.name}</Link>
