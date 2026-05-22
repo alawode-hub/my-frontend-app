@@ -8,7 +8,15 @@ import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URI; // added this
+const API_URL = import.meta.env.VITE_API_URI;
+
+// Helper to fix image URLs
+const getFullImageUrl = (path) => {
+  if (!path) return "/placeholder.jpg";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/")) return `${API_URL}${path}`;
+  return `${API_URL}/${path}`;
+};
 
 // ORDERS LIST COMPONENT
 const OrdersList = ({ user }) => {
@@ -21,7 +29,7 @@ const OrdersList = ({ user }) => {
         const config = {
           headers: { Authorization: `Bearer ${user.token}` },
         };
-        const { data } = await axios.get(`${API_URL}/api/orders/myorders`, config); // fixed here
+        const { data } = await axios.get(`${API_URL}/api/orders/myorders`, config);
         setOrders(data);
         setLoading(false);
       } catch (error) {
@@ -124,7 +132,7 @@ const OrdersList = ({ user }) => {
                 borderBottom: "1px solid #222"
               }}>
                 <img
-                  src={`${API_URL}${item.image}`} // fixed here
+                  src={getFullImageUrl(item.image)}
                   alt={item.name}
                   style={{
                     width: "70px",
@@ -132,6 +140,7 @@ const OrdersList = ({ user }) => {
                     objectFit: "cover",
                     background: "#0a0a0a"
                   }}
+                  onError={(e) => { e.target.src = "/placeholder.jpg"; }}
                 />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: "600", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
