@@ -236,8 +236,10 @@ a {
   object-position: center;
   display: block;
   transition: transform 0.4s ease;
-  background-color: #1a1a1a;
+  background-color: #111; /* match card background */
+  border-radius: 8px 8px 0 0; /* optional: round top corners */
 }
+
 
 .product-card:hover {
   transform: translateY(-8px);
