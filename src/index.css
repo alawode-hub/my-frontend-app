@@ -1,4 +1,4 @@
-/* RESET + GENERAL */
+[5:53 am, 22/05/2026] Mk: /* RESET + GENERAL */
 * {
   margin: 0;
   padding: 0;
@@ -326,7 +326,6 @@ a {
   align-items: start;
 }
 
-
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -362,7 +361,6 @@ a {
   font-size: 0.95rem;
   line-height: 1.7;
 }
-
 
 /* ================= MOBILE RESPONSIVE ================= */
 
@@ -483,4 +481,4 @@ a {
   .nav-username {
     display: none;
   }
-}
+} 
