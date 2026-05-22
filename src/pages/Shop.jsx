@@ -24,6 +24,7 @@ function Shop() {
   const categoryFromUrl = queryParams.get("category");
 
   const [activeCategory, setActiveCategory] = useState("ALL PRODUCTS");
+  const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
@@ -43,12 +44,13 @@ function Shop() {
   }, [categoryFromUrl, location.state]);
 
   useEffect(() => {
-    if (activeCategory === "ALL PRODUCTS") {
-      navigate("/shop", { replace: true });
-    } else {
-      navigate(`/shop?category=${activeCategory}`, { replace: true });
-    }
-  }, [activeCategory, navigate]);
+    let url = "/shop";
+    const params = [];
+    if (activeCategory !== "ALL PRODUCTS") params.push(`category=${activeCategory}`);
+    if (searchQuery) params.push(`search=${searchQuery}`);
+    if (params.length > 0) url += `?${params.join("&")}`;
+    navigate(url, { replace: true });
+  }, [activeCategory, searchQuery, navigate]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -56,7 +58,7 @@ function Shop() {
         const { data } = await axios.get(`${API_URL}/api/products`);
         const normalized = data.map(p => ({
           ...p,
-          image: getFullImageUrl(p.image), // FIX HERE
+          image: getFullImageUrl(p.image),
           countInStock: Number(p.stock ?? p.countInStock ?? 0)
         }));
         setProducts(normalized);
@@ -70,10 +72,19 @@ function Shop() {
     fetchProducts();
   }, []);
 
+  // FILTER LOGIC - category + search
   const filteredProducts = products.filter(product => {
-    if (activeCategory === "ALL PRODUCTS") return true;
-    const productCat = product.category?.toUpperCase().replace(/\s+/g, "");
-    return productCat === activeCategory;
+    const matchCategory = activeCategory === "ALL PRODUCTS" 
+      ? true 
+      : product.category?.toUpperCase().replace(/\s+/g, "") === activeCategory;
+
+    const matchSearch = searchQuery === ""
+      ? true
+      : product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchCategory && matchSearch;
   });
 
   const [addedItems, setAddedItems] = useState({})
@@ -125,6 +136,45 @@ function Shop() {
         </h1>
         <div style={{ width: "40px", height: "3px", background: "#FF0000", margin: "0 auto 2.5rem auto" }}></div>
 
+        {/* SEARCH BAR WITH CLEAR BUTTON */}
+        <div style={{ maxWidth: "500px", margin: "0 auto 2rem auto", position: "relative" }}>
+          <input
+            type="text"
+            placeholder="SEARCH PRODUCTS..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "12px 40px 12px 16px",
+              background: "#111",
+              border: "1px solid #333",
+              color: "#fff",
+              fontSize: "14px",
+              outline: "none",
+              letterSpacing: "1px"
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "transparent",
+                border: "none",
+                color: "#999",
+                fontSize: "20px",
+                cursor: "pointer",
+                lineHeight: 1
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+
         <div className="filter-tabs">
           {categories.map(cat => (
             <CategoryTab key={cat} cat={cat} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
@@ -133,7 +183,9 @@ function Shop() {
 
         <div className="product-grid">
           {filteredProducts.length === 0 ? (
-            <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#666" }}>NO PRODUCTS IN THIS CATEGORY YET.</p>
+            <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#666" }}>
+              NO PRODUCTS FOUND FOR "{searchQuery || activeCategory}"
+            </p>
           ) : (
             filteredProducts.map(product => (
               <ProductCardReplit key={product._id} product={product} handleAddToCart={handleAddToCart} addedItems={addedItems} activeCategory={activeCategory} />
@@ -183,7 +235,7 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
       <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
         <Link to={`/product/${product._id}`} state={{ fromCategory: activeCategory }}>
           <img 
-            src={product.image} // CHANGED: use product.image directly
+            src={product.image}
             alt={product.name} 
             style={{ 
               width: "100%",
