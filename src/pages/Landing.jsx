@@ -21,7 +21,7 @@ function Landing() {
       try {
         const { data } = await axios.get(`${API_URL}/api/products`);
 
-        // Use includes + fallback to first 4 products if no match
+        
         const keywords = ["splatter", "timberland", "essentials", "cap"];
         let selected = data.filter(p =>
           keywords.some(k => p.name.toLowerCase().includes(k))
