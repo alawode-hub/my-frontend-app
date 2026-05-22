@@ -322,7 +322,7 @@ a {
 .product-detail-layout {
   display: grid;
   grid-template-columns: 500px 1.2fr;
-  gap: 3rem;
+  gap: 1.5rem;
   align-items: start;
 }
 
