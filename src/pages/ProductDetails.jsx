@@ -37,7 +37,6 @@ const ProductDetails = () => {
         let stock = Number(data.stock?? data.countInStock?? 0);
 
         // TEMP FIX: If stock is 0, show 12 available
-        // Remove this line once you update the DB
         if (stock <= 0) stock = 12;
 
         const normalizedData = {
@@ -124,12 +123,12 @@ const ProductDetails = () => {
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 2rem 4rem" }}>
         <div className="product-detail-layout">
 
-          <div style={{ background: "#111", borderRadius: "8px", overflow: "hidden" }}>
+          {/* Changed: Added class product-img-wrap */}
+          <div className="product-img-wrap">
             <img
               src={product.image}
               alt={product.name}
               onError={(e) => { e.target.src = "https://via.placeholder.com/600x600/1a1a1a/FF0000?text=No+Image"; }}
-              style={{ width: "100%", height: "100%", objectFit: "contain", background: "#111", display: "block" }}
             />
           </div>
 

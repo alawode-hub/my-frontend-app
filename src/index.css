@@ -326,6 +326,26 @@ a {
   align-items: start;
 }
 
+/* Added this - controls image size */
+.product-img-wrap {
+  background: #111;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.product-img-wrap img {
+  width: 100%;
+  max-width: 500px; /* limits how big image gets */
+  max-height: 550px; /* limits height so it no dey too tall */
+  object-fit: contain;
+  background: #111;
+  display: block;
+}
+
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -361,6 +381,7 @@ a {
   font-size: 0.95rem;
   line-height: 1.7;
 }
+
 
 /* ================= MOBILE RESPONSIVE ================= */
 
