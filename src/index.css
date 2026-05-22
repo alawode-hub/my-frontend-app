@@ -328,21 +328,21 @@ a {
 
 /* Added this - controls image size */
 .product-img-wrap {
-  background: #111;
+  background: #111; /* dark background like the rest */
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 0; /* removed padding so no white space */
 }
 
 .product-img-wrap img {
   width: 100%;
-  max-width: 500px; /* limits how big image gets */
-  max-height: 550px; /* limits height so it no dey too tall */
+  max-width: 500px;
+  max-height: 550px;
   object-fit: contain;
-  background: #111;
+  background: transparent; /* let the div background show */
   display: block;
 }
 
