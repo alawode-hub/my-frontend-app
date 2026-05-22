@@ -321,20 +321,11 @@ a {
 /* PRODUCT DETAILS */
 .product-detail-layout {
   display: grid;
-  grid-template-columns: 500px 1.2fr;
-  gap: 0.5rem;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
   align-items: start;
 }
 
-.product-detail-layout img {
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  width: 100%;
-  max-height: 500px;
-  object-fit: contain;
-  display: block;
-}
 
 .features-grid {
   display: grid;
