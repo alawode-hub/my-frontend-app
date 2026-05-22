@@ -319,12 +319,20 @@ a {
 }
 
 /* PRODUCT DETAILS */
+.product-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
+  align-items: start;
+}
+
 .product-detail-layout img {
   background: #fff;
   border-radius: 8px;
-  padding: 10px; /* reduce this */
+  padding: 20px;
   max-width: 500px;
   max-height: 500px;
+  width: 100%;
   object-fit: contain;
   display: block;
   margin: 0 auto;
