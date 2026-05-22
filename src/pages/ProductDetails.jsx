@@ -124,13 +124,20 @@ const ProductDetails = () => {
         <div className="product-detail-layout">
 
           {/* Changed: Added class product-img-wrap */}
-          <div className="product-img-wrap">
-            <img
-              src={product.image}
-              alt={product.name}
-              onError={(e) => { e.target.src = "https://via.placeholder.com/600x600/1a1a1a/FF0000?text=No+Image"; }}
-            />
-          </div>
+         <img
+  src={product.image}
+  alt={product.name}
+  onError={(e) => { e.target.src = "https://via.placeholder.com/600x600/1a1a1a/FF0000?text=No+Image"; }}
+  style={{ 
+    width: "100%", 
+    maxWidth: "500px",  /* controls width */
+    maxHeight: "500px", /* controls height - reduce this to make it smaller */
+    objectFit: "contain", 
+    background: "#111", 
+    display: "block",
+    margin: "0 auto" /* centers it */
+  }}
+/>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <p style={{ fontSize: "0.75rem", fontWeight: "600", letterSpacing: "1.5px", color: "#666", textTransform: "uppercase" }}>
