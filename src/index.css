@@ -284,9 +284,7 @@ a {
   padding-bottom: 8px; /* creates space under text */
 }
 
-.mk-footer a:hover {
-  color: #FF0000;
-}
+
 
 .mk-footer a::after {
   content: '';
