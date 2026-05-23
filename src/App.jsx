@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";  // add this
 import Landing from "./pages/Landing";
 import Shop from "./pages/Shop";
 import Login from "./pages/Login";
@@ -16,6 +17,7 @@ import Order from "./pages/Order"
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" reverseOrder={false} />  {/* add this line */}
       <Routes>
         <Route path="/" element={<Landing />} />        
         <Route path="/landing" element={<Landing />} />
