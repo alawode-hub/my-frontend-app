@@ -8,6 +8,8 @@ import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Checkout() {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const { user } = useSelector((state) => state.auth);
@@ -34,14 +36,14 @@ function Checkout() {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.fullName ||!form.address ||!form.city ||!form.phone) {
+    if (!form.fullName || !form.address || !form.city || !form.phone) {
       toast.error("PLEASE FILL ALL SHIPPING FIELDS", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
       return;
     }
 
-    if (!user ||!user._id) {
+    if (!user || !user._id) {
       toast.error("PLEASE LOGIN FIRST", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
@@ -50,13 +52,9 @@ function Checkout() {
     }
 
     const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
-
     for (let item of cartItems) {
       if (!isValidObjectId(item._id)) {
-        toast.error("INVALID PRODUCT ID IN CART. CLEAR CART AND ADD AGAIN", {
-          style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
-        });
-        console.error('Bad ID:', item._id);
+        toast.error("INVALID PRODUCT ID IN CART. CLEAR CART AND ADD AGAIN");
         return;
       }
     }
@@ -65,7 +63,8 @@ function Checkout() {
     try {
       const token = user.token;
 
-      await API.post("/orders", {
+      // 1. Create order with isPaid: false
+      const { data: order } = await API.post("/orders", {
         orderItems: cartItems.map(item => ({
           name: item.name,
           qty: item.qty,
@@ -84,24 +83,31 @@ function Checkout() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      dispatch(clearCart());
-      toast.success("ORDER PLACED SUCCESSFULLY", {
-        style: { background: '#111', color: '#fff', border: '1px solid #FF0000', fontWeight: '700', letterSpacing: '1px' }
+      // 2. Initialize Paystack payment
+      const { data: payment } = await API.post("/payment/initialize", {
+        email: user.email,
+        amount: totalPrice,
+        orderId: order._id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setTimeout(() => navigate("/orders"), 1500);
+
+      // 3. Redirect to Paystack
+      window.location.href = payment.data.authorization_url;
+
+      // Don't clear cart here - webhook will confirm payment first
     } catch (err) {
-      console.log("BACKEND ERROR:", err.response?.data);
-      toast.error(err.response?.data?.message || "ORDER FAILED. TRY AGAIN", {
+      console.log("CHECKOUT ERROR:", err.response?.data);
+      toast.error(err.response?.data?.message || "CHECKOUT FAILED. TRY AGAIN", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
-    } finally {
       setLoading(false);
     }
   };
 
   if (!cartItems || cartItems.length === 0) {
     return (
-      <div style={{ background: "#0a", color: "#fff", minHeight: "100vh" }}>
+      <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
         <Navbar />
         <div style={{ textAlign: "center", padding: "4rem 2rem" }}>
           <p style={{ fontSize: "1.2rem", color: "#666", marginBottom: "2rem" }}>YOUR CART IS EMPTY</p>
@@ -127,7 +133,6 @@ function Checkout() {
       <Toaster position="top-center" duration={2500} />
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "4rem 2rem" }}>
-
         <div style={{ marginBottom: "3rem" }}>
           <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "0.5rem" }}>
             CHECKOUT
@@ -143,12 +148,7 @@ function Checkout() {
         }} className="checkout-layout">
 
           <div>
-            <h2 style={{
-              fontSize: "1rem",
-              fontWeight: "700",
-              letterSpacing: "1.5px",
-              marginBottom: "2rem"
-            }}>
+            <h2 style={{ fontSize: "1rem", fontWeight: "700", letterSpacing: "1.5px", marginBottom: "2rem" }}>
               SHIPPING INFO
             </h2>
 
@@ -185,12 +185,7 @@ function Checkout() {
           </div>
 
           <div style={{ background: "#111", padding: "2rem", position: "sticky", top: "2rem" }}>
-            <h2 style={{
-              fontSize: "1rem",
-              fontWeight: "700",
-              letterSpacing: "1.5px",
-              marginBottom: "2rem"
-            }}>
+            <h2 style={{ fontSize: "1rem", fontWeight: "700", letterSpacing: "1.5px", marginBottom: "2rem" }}>
               ORDER SUMMARY
             </h2>
 
@@ -235,23 +230,19 @@ function Checkout() {
                 fontSize: "0.85rem",
                 fontWeight: "700",
                 letterSpacing: "1.5px",
-                cursor: loading? "not-allowed" : "pointer",
-                opacity: loading? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "0.5rem",
                 transition: "all 0.2s"
               }}
-              onMouseEnter={(e) => {
-                if(!loading) e.target.style.background = "#cc0000"
-              }}
-              onMouseLeave={(e) => {
-                if(!loading) e.target.style.background = "#FF0000"
-              }}
+              onMouseEnter={(e) => { if(!loading) e.target.style.background = "#cc0000" }}
+              onMouseLeave={(e) => { if(!loading) e.target.style.background = "#FF0000" }}
             >
-              {loading? <ClipLoader color="#fff" size={20} /> : null}
-              {loading? "PLACING ORDER..." : `PLACE ORDER - ₦${totalPrice.toLocaleString()}`}
+              {loading ? <ClipLoader color="#fff" size={20} /> : null}
+              {loading ? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
             </button>
           </div>
         </form>
