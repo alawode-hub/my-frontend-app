@@ -8,7 +8,8 @@ import { addToCart } from "../redux/cartSlice";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URI;
+// Make sure this matches your Vercel env var: VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper to make sure image URL is absolute
 const getFullImageUrl = (url) => {
@@ -22,9 +23,10 @@ function Shop() {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const categoryFromUrl = queryParams.get("category");
+  const searchFromUrl = queryParams.get("search");
 
   const [activeCategory, setActiveCategory] = useState("ALL PRODUCTS");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchFromUrl || "");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
@@ -32,6 +34,7 @@ function Shop() {
 
   const categories = ["ALL PRODUCTS", "TOPS", "JEANS", "CAPS", "SNEAKERS", "HOODIES", "SHORTJEANS"];
 
+  // Set category from URL or state on first load
   useEffect(() => {
     if (location.state?.activeCategory) {
       setActiveCategory(location.state.activeCategory);
@@ -43,49 +46,46 @@ function Shop() {
     }
   }, [categoryFromUrl, location.state]);
 
+  // Update URL when filters change
   useEffect(() => {
-    let url = "/shop";
     const params = [];
     if (activeCategory !== "ALL PRODUCTS") params.push(`category=${activeCategory}`);
     if (searchQuery) params.push(`search=${searchQuery}`);
-    if (params.length > 0) url += `?${params.join("&")}`;
+    
+    const url = params.length > 0 ? `/shop?${params.join("&")}` : "/shop";
     navigate(url, { replace: true });
   }, [activeCategory, searchQuery, navigate]);
 
+  // Fetch products from backend with filters
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/products`);
+        setLoading(true);
+        
+        const params = new URLSearchParams();
+        if (activeCategory !== "ALL PRODUCTS") params.append("category", activeCategory);
+        if (searchQuery) params.append("search", searchQuery);
+
+        const url = `${API_URL}/api/products${params.toString() ? `?${params.toString()}` : ""}`;
+        const { data } = await axios.get(url);
+        
         const normalized = data.map(p => ({
           ...p,
           image: getFullImageUrl(p.image),
           countInStock: Number(p.stock ?? p.countInStock ?? 0)
         }));
+        
         setProducts(normalized);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
         toast.error("FAILED TO LOAD PRODUCTS");
+      } finally {
         setLoading(false);
       }
     };
+    
     fetchProducts();
-  }, []);
-
-  // FILTER LOGIC - category + search
-  const filteredProducts = products.filter(product => {
-    const matchCategory = activeCategory === "ALL PRODUCTS" 
-      ? true 
-      : product.category?.toUpperCase().replace(/\s+/g, "") === activeCategory;
-
-    const matchSearch = searchQuery === ""
-      ? true
-      : product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category?.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchCategory && matchSearch;
-  });
+  }, [activeCategory, searchQuery]); // re-run when filters change
 
   const [addedItems, setAddedItems] = useState({})
 
@@ -182,12 +182,12 @@ function Shop() {
         </div>
 
         <div className="product-grid">
-          {filteredProducts.length === 0 ? (
+          {products.length === 0 ? (
             <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#666" }}>
               NO PRODUCTS FOUND FOR "{searchQuery || activeCategory}"
             </p>
           ) : (
-            filteredProducts.map(product => (
+            products.map(product => (
               <ProductCardReplit key={product._id} product={product} handleAddToCart={handleAddToCart} addedItems={addedItems} activeCategory={activeCategory} />
             ))
           )}
