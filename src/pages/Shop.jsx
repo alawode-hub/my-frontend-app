@@ -8,10 +8,8 @@ import { addToCart } from "../redux/cartSlice";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
-// Make sure this matches your Vercel env var: VITE_API_URL
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Helper to make sure image URL is absolute
 const getFullImageUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
@@ -32,15 +30,18 @@ function Shop() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
-  const categories = ["ALL PRODUCTS", "TOPS", "JEANS", "CAPS", "SNEAKERS", "HOODIES", "SHORTJEANS"];
+  const categories = ["ALL PRODUCTS", "TOPS", "JEANS", "CAPS", "SNEAKERS", "HOODIES", "SHORT JEANS"];
 
-  // Set category from URL or state on first load
+  // Set category from URL on first load
   useEffect(() => {
     if (location.state?.activeCategory) {
       setActiveCategory(location.state.activeCategory);
     } else if (categoryFromUrl) {
-      const formatted = categoryFromUrl.toUpperCase().replace(/\s+/g, "");
-      setActiveCategory(formatted);
+      // Match exactly with categories array
+      const found = categories.find(
+        c => c.toLowerCase().replace(/\s+/g, "") === categoryFromUrl.toLowerCase().replace(/\s+/g, "")
+      );
+      setActiveCategory(found || "ALL PRODUCTS");
     } else {
       setActiveCategory("ALL PRODUCTS");
     }
@@ -49,7 +50,9 @@ function Shop() {
   // Update URL when filters change
   useEffect(() => {
     const params = [];
-    if (activeCategory !== "ALL PRODUCTS") params.push(`category=${activeCategory}`);
+    if (activeCategory !== "ALL PRODUCTS") {
+      params.push(`category=${activeCategory.toLowerCase().replace(/\s+/g, "")}`);
+    }
     if (searchQuery) params.push(`search=${searchQuery}`);
     
     const url = params.length > 0 ? `/shop?${params.join("&")}` : "/shop";
@@ -63,8 +66,10 @@ function Shop() {
         setLoading(true);
         
         const params = new URLSearchParams();
-        if (activeCategory !== "ALL PRODUCTS") params.append("category", activeCategory);
-        if (searchQuery) params.append("search", searchQuery);
+        if (activeCategory !== "ALL PRODUCTS") {
+          params.append("category", activeCategory);
+        }
+        if (searchQuery) params.append("keyword", searchQuery); // use 'keyword' not 'search'
 
         const url = `${API_URL}/api/products${params.toString() ? `?${params.toString()}` : ""}`;
         const { data } = await axios.get(url);
@@ -85,7 +90,7 @@ function Shop() {
     };
     
     fetchProducts();
-  }, [activeCategory, searchQuery]); // re-run when filters change
+  }, [activeCategory, searchQuery]);
 
   const [addedItems, setAddedItems] = useState({})
 
@@ -136,7 +141,7 @@ function Shop() {
         </h1>
         <div style={{ width: "40px", height: "3px", background: "#FF0000", margin: "0 auto 2.5rem auto" }}></div>
 
-        {/* SEARCH BAR WITH CLEAR BUTTON */}
+        {/* SEARCH BAR */}
         <div style={{ maxWidth: "500px", margin: "0 auto 2rem auto", position: "relative" }}>
           <input
             type="text"
