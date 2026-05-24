@@ -8,10 +8,8 @@ import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 function Checkout() {
-  const cartItems = useSelector((state) => state.cart.cartItems);
+  const cartItems = useSelector((state) => state.cartItems);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -95,7 +93,6 @@ function Checkout() {
       // 3. Redirect to Paystack
       window.location.href = payment.data.authorization_url;
 
-      // Don't clear cart here - webhook will confirm payment first
     } catch (err) {
       console.log("CHECKOUT ERROR:", err.response?.data);
       toast.error(err.response?.data?.message || "CHECKOUT FAILED. TRY AGAIN", {

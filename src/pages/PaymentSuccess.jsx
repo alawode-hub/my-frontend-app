@@ -19,7 +19,7 @@ const PaymentSuccess = () => {
       try {
         const token = localStorage.getItem('token');
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/payment/verify/${reference}`,
+          `${import.meta.env.VITE_API_URI}/api/payment/verify/${reference}`, // FIXED
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

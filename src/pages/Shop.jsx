@@ -8,7 +8,7 @@ import { addToCart } from "../redux/cartSlice";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URI; // FIXED: changed from VITE_API_URL
 
 const getFullImageUrl = (url) => {
   if (!url) return "";
@@ -37,7 +37,6 @@ function Shop() {
     if (location.state?.activeCategory) {
       setActiveCategory(location.state.activeCategory);
     } else if (categoryFromUrl) {
-      // Match exactly with categories array
       const found = categories.find(
         c => c.toLowerCase().replace(/\s+/g, "") === categoryFromUrl.toLowerCase().replace(/\s+/g, "")
       );
@@ -69,7 +68,7 @@ function Shop() {
         if (activeCategory !== "ALL PRODUCTS") {
           params.append("category", activeCategory);
         }
-        if (searchQuery) params.append("keyword", searchQuery); // use 'keyword' not 'search'
+        if (searchQuery) params.append("keyword", searchQuery);
 
         const url = `${API_URL}/api/products${params.toString() ? `?${params.toString()}` : ""}`;
         const { data } = await axios.get(url);
