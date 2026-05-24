@@ -21,7 +21,6 @@ function Landing() {
       try {
         const { data } = await axios.get(`${API_URL}/api/products`);
 
-        
         const keywords = ["splatter", "timberland", "essentials", "cap"];
         let selected = data.filter(p =>
           keywords.some(k => p.name.toLowerCase().includes(k))
@@ -106,9 +105,9 @@ function Landing() {
               {featuredProducts.map(product => (
                 <Link to={`/product/${product._id}`} key={product._id} style={{ textDecoration: "none" }}>
                   <div className="product-card">
-                    <div style={{ width: "100%", height: "280px", overflow: "hidden", background: "#000" }}>
+                    <div className="product-img-wrapper">
                       <img
-                        src={`${API_URL}${product.image}`}
+                        src={product.image.startsWith('http') ? product.image : `${API_URL}${product.image}`}
                         alt={product.name}
                         onError={(e) => { e.target.src = "https://via.placeholder.com/400x400/1a1a1a/FF0000?text=MK"; }}
                       />
