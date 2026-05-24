@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginUser, resetError, resetSuccess } from "../redux/authSlice";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
-import { Toaster, toast } from "react-hot-toast"; // ← NEW
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -27,12 +27,12 @@ const Login = () => {
 
   useEffect(() => {
     if (error) {
-      toast.error(error.toUpperCase()); // ← TOAST
+      toast.error(error.toUpperCase());
       dispatch(resetError());
     }
     
     if (successMessage && user) {
-      toast.success(successMessage.toUpperCase()); // ← TOAST
+      toast.success(successMessage.toUpperCase());
       dispatch(resetSuccess());
       
       setTimeout(() => {
@@ -41,33 +41,12 @@ const Login = () => {
         } else {
           navigate("/shop");
         }
-      }, 1500); // ← 1.5s so user see toast
+      }, 1500);
     }
   }, [error, successMessage, user, navigate, dispatch]);
 
   return (
     <div className="auth-page">
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#111',
-            color: '#fff',
-            border: '1px solid #333',
-            fontWeight: '700',
-            letterSpacing: '0.5px'
-          },
-          success: { 
-            iconTheme: { primary: '#00ff00', secondary: '#000' },
-            duration: 2000
-          },
-          error: { 
-            iconTheme: { primary: '#ff0000', secondary: '#000' },
-            duration: 3000
-          },
-        }}
-      />
-
       <div className="auth-box">
         <h2>LOGIN</h2>
 
@@ -104,27 +83,26 @@ const Login = () => {
             </span>
           </div>
           <button 
-  type="submit" 
-  className="btn-white" 
-  disabled={loading}
-  style={{ 
-    width: '100%',
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    gap: '10px' 
-  }}
->
-  {loading ? (
-    <>
-      <ClipLoader size={18} color="#000" />
-      LOGGING IN...
-    </>
-  ) : (
-    "LOGIN"
-  )}
-</button>
-
+            type="submit" 
+            className="btn-white" 
+            disabled={loading}
+            style={{ 
+              width: '100%',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '10px' 
+            }}
+          >
+            {loading ? (
+              <>
+                <ClipLoader size={18} color="#000" />
+                LOGGING IN...
+              </>
+            ) : (
+              "LOGIN"
+            )}
+          </button>
         </form>
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register</Link>

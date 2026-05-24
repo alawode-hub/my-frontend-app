@@ -12,7 +12,7 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    toast.success("Logged out successfully");
+    toast.success("LOGGED OUT SUCCESSFULLY");
     navigate("/login");
     setShowModal(false);
   };
@@ -28,7 +28,7 @@ const LogoutButton = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.6)",
+          backgroundColor: "rgba(0,0,0,0.7)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -38,20 +38,21 @@ const LogoutButton = () => {
       >
         <div 
           style={{
-            backgroundColor: "white",
-            color: "black",
+            backgroundColor: "#111",
+            color: "white",
             padding: "24px",
             borderRadius: "8px",
             width: "320px",
-            textAlign: "center"
+            textAlign: "center",
+            border: "1px solid #333"
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "12px" }}>
-            Logout
+          <h2 style={{ fontSize: "18px", fontWeight: "900", marginBottom: "12px", letterSpacing: "1px" }}>
+            LOGOUT
           </h2>
-          <p style={{ color: "#6b7280", marginBottom: "20px" }}>
-            Are you sure you want to logout?
+          <p style={{ color: "#999", marginBottom: "20px", fontSize: "14px" }}>
+            ARE YOU SURE YOU WANT TO LOGOUT?
           </p>
           
           <div style={{ display: "flex", gap: "12px" }}>
@@ -59,30 +60,33 @@ const LogoutButton = () => {
               onClick={() => setShowModal(false)}
               style={{
                 flex: 1,
-                backgroundColor: "#e5e7eb",
+                backgroundColor: "transparent",
+                border: "1px solid #333",
+                color: "#fff",
                 padding: "10px",
                 borderRadius: "6px",
-                border: "none",
                 cursor: "pointer",
-                fontWeight: "600"
+                fontWeight: "700",
+                letterSpacing: "1px"
               }}
             >
-              No
+              NO
             </button>
             <button 
               onClick={handleLogout}
               style={{
                 flex: 1,
-                backgroundColor: "#ef4444",
+                backgroundColor: "#FF0000",
                 color: "white",
                 padding: "10px",
                 borderRadius: "6px",
                 border: "none",
                 cursor: "pointer",
-                fontWeight: "600"
+                fontWeight: "700",
+                letterSpacing: "1px"
               }}
             >
-              Yes
+              YES
             </button>
           </div>
         </div>
@@ -96,6 +100,7 @@ const LogoutButton = () => {
       <button 
         onClick={() => setShowModal(true)} 
         className="btn-white"
+        style={{ background: "transparent", border: "1px solid #fff" }}
       >
         LOGOUT
       </button>

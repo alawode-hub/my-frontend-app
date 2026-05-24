@@ -13,12 +13,32 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Order from "./pages/Order";
-import PaymentSuccess from "./pages/PaymentSuccess"; // added
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 function App() {
   return (
     <Router>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster 
+        position="top-center" 
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: '#111',
+            color: '#fff',
+            border: '1px solid #333',
+            fontWeight: '700',
+            letterSpacing: '0.5px'
+          },
+          success: { 
+            iconTheme: { primary: '#00ff00', secondary: '#000' },
+            duration: 2000
+          },
+          error: { 
+            iconTheme: { primary: '#ff0000', secondary: '#000' },
+            duration: 3000
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/landing" element={<Landing />} />
