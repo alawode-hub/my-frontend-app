@@ -15,12 +15,12 @@ body {
   background: #000;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  padding-top: 60px; /* increased for navbar */
+  padding-top: 60px;
 }
 
+/* Only set height:auto for images NOT in product cards */
 img {
   max-width: 100%;
-  height: auto;
 }
 
 a {
@@ -32,7 +32,7 @@ a {
   color: #ff0000 !important;
 }
 
-/* NAVBAR - Fixed mobile spacing */
+/* NAVBAR */
 .navbar {
   position: fixed;
   top: 0;
@@ -191,7 +191,7 @@ a {
   }
 }
 
-/* LANDING SECTION FOR 4 IMAGES */
+/* LANDING SECTION */
 .landing-collection {
   padding: 4rem 0;
   background: #0a0a0a;
@@ -237,6 +237,7 @@ a {
   height: 320px;
   overflow: hidden;
   background: #000;
+  flex-shrink: 0;
 }
 
 .product-img-wrapper img {
@@ -257,15 +258,33 @@ a {
   transform: scale(1.05);
 }
 
-.product-info {
-  padding: 15px 0;
-  display: flex;
-  justify-content: space-between;
-  font-weight: 500;
-  font-size: 14px;
+/* TABLET */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+  }
+  
+  .product-img-wrapper {
+    height: 260px;
+  }
 }
 
-/* CART LAYOUT */
+/* MOBILE */
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+  
+  .product-img-wrapper {
+    height: 280px;
+  }
+}
+
+/* REST OF YOUR CSS UNCHANGED */
 .cart-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -280,7 +299,6 @@ a {
   gap: 1rem;
 }
 
-/* FILTER TABS */
 .filter-tabs {
   display: flex;
   justify-content: center;
@@ -289,7 +307,6 @@ a {
   flex-wrap: wrap;
 }
 
-/* AUTH PAGES */
 .auth-page {
   display: flex;
   justify-content: center;
@@ -307,7 +324,7 @@ a {
 }
 
 .auth-box h2 {
-  fontSize: 32px;
+  font-size: 32px;
   font-weight: 900;
   margin-bottom: 30px;
   text-align: center;
@@ -335,7 +352,6 @@ a {
   font-weight: 700;
 }
 
-/* FOOTER */
 .mk-footer {
   background: #09090b;
   padding: 64px 5% 32px;
@@ -416,7 +432,6 @@ a {
   gap: 24px;
 }
 
-/* PRODUCT DETAILS */
 .product-detail-layout {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
@@ -460,20 +475,6 @@ a {
   line-height: 1.7;
 }
 
-/* TABLET */
-@media (max-width: 1024px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    padding: 0 1.5rem;
-  }
-  
-  .product-img-wrapper {
-    height: 260px;
-  }
-}
-
-/* MOBILE */
 @media (max-width: 768px) {
   .cart-layout {
     grid-template-columns: 1fr;
@@ -523,18 +524,6 @@ a {
   .features-grid {
     grid-template-columns: 1fr;
     gap: 3rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .product-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 0 1rem;
-  }
-  
-  .product-img-wrapper {
-    height: 280px;
   }
 }
 
