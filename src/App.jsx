@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "react-hot-toast";  // add this
+import { Toaster } from "react-hot-toast";
 import Landing from "./pages/Landing";
 import Shop from "./pages/Shop";
 import Login from "./pages/Login";
@@ -12,16 +12,17 @@ import "./index.css";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
-import Order from "./pages/Order"
+import Order from "./pages/Order";
+import PaymentSuccess from "./pages/PaymentSuccess"; // added
 
 function App() {
   return (
     <Router>
-      <Toaster position="top-center" reverseOrder={false} />  {/* add this line */}
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
-        <Route path="/" element={<Landing />} />        
+        <Route path="/" element={<Landing />} />
         <Route path="/landing" element={<Landing />} />
-        
+
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
 
@@ -66,6 +67,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/payment-success"
+          element={
+            <ProtectedRoute>
+              <PaymentSuccess />
+            </ProtectedRoute>
+          }
+        />
 
         {/* PUBLIC ROUTES */}
         <Route path="/login" element={<Login />} />
@@ -79,7 +88,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route path="*" element={<h1 style={{color: '#fff', textAlign: 'center', padding: '4rem'}}>404 - PAGE NOT FOUND</h1>} />
       </Routes>
     </Router>
