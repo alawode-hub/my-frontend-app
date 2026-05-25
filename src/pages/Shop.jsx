@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -8,7 +8,7 @@ import { addToCart } from "../redux/cartSlice";
 import { ClipLoader } from "react-spinners";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URI; // FIXED: changed from VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URI;
 
 const getFullImageUrl = (url) => {
   if (!url) return "";
@@ -25,10 +25,12 @@ function Shop() {
 
   const [activeCategory, setActiveCategory] = useState("ALL PRODUCTS");
   const [searchQuery, setSearchQuery] = useState(searchFromUrl || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchFromUrl || "");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const isFirstRender = useRef(true);
 
   const categories = ["ALL PRODUCTS", "TOPS", "JEANS", "CAPS", "SNEAKERS", "HOODIES", "SHORT JEANS"];
 
@@ -46,39 +48,53 @@ function Shop() {
     }
   }, [categoryFromUrl, location.state]);
 
+  // Debounce search input - wait 500ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Update URL when filters change
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const params = [];
-    if (activeCategory !== "ALL PRODUCTS") {
+    if (activeCategory!== "ALL PRODUCTS") {
       params.push(`category=${activeCategory.toLowerCase().replace(/\s+/g, "")}`);
     }
-    if (searchQuery) params.push(`search=${searchQuery}`);
-    
-    const url = params.length > 0 ? `/shop?${params.join("&")}` : "/shop";
+    if (debouncedSearch) params.push(`search=${debouncedSearch}`);
+
+    const url = params.length > 0? `/shop?${params.join("&")}` : "/shop";
     navigate(url, { replace: true });
-  }, [activeCategory, searchQuery, navigate]);
+  }, [activeCategory, debouncedSearch, navigate]);
 
   // Fetch products from backend with filters
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        
+
         const params = new URLSearchParams();
-        if (activeCategory !== "ALL PRODUCTS") {
+        if (activeCategory!== "ALL PRODUCTS") {
           params.append("category", activeCategory);
         }
-        if (searchQuery) params.append("keyword", searchQuery);
+        if (debouncedSearch) params.append("keyword", debouncedSearch);
 
-        const url = `${API_URL}/api/products${params.toString() ? `?${params.toString()}` : ""}`;
+        const url = `${API_URL}/api/products${params.toString()? `?${params.toString()}` : ""}`;
         const { data } = await axios.get(url);
-        
+
         const normalized = data.map(p => ({
-          ...p,
+         ...p,
           image: getFullImageUrl(p.image),
-          countInStock: Number(p.stock ?? p.countInStock ?? 0)
+          countInStock: Number(p.stock?? p.countInStock?? 0)
         }));
-        
+
         setProducts(normalized);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -87,9 +103,9 @@ function Shop() {
         setLoading(false);
       }
     };
-    
+
     fetchProducts();
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, debouncedSearch]);
 
   const [addedItems, setAddedItems] = useState({})
 
@@ -118,16 +134,6 @@ function Shop() {
       setAddedItems(prev => ({...prev, [product._id]: false }))
     }, 1500)
   };
-
-  if (loading) return (
-    <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
-      <Navbar />
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh", flexDirection: "column", gap: "1rem" }}>
-        <ClipLoader color="#FF0000" size={50} />
-        <p style={{ color: "#666", fontSize: "0.9rem", letterSpacing: "1px" }}>LOADING PRODUCTS...</p>
-      </div>
-    </div>
-  );
 
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
@@ -185,17 +191,24 @@ function Shop() {
           ))}
         </div>
 
-        <div className="product-grid">
-          {products.length === 0 ? (
-            <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#666" }}>
-              NO PRODUCTS FOUND FOR "{searchQuery || activeCategory}"
-            </p>
-          ) : (
-            products.map(product => (
-              <ProductCardReplit key={product._id} product={product} handleAddToCart={handleAddToCart} addedItems={addedItems} activeCategory={activeCategory} />
-            ))
-          )}
-        </div>
+        {loading? (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh", flexDirection: "column", gap: "1rem" }}>
+            <ClipLoader color="#FF0000" size={50} />
+            <p style={{ color: "#666", fontSize: "0.9rem", letterSpacing: "1px" }}>LOADING PRODUCTS...</p>
+          </div>
+        ) : (
+          <div className="product-grid">
+            {products.length === 0? (
+              <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#666" }}>
+                NO PRODUCTS FOUND FOR "{debouncedSearch || activeCategory}"
+              </p>
+            ) : (
+              products.map(product => (
+                <ProductCardReplit key={product._id} product={product} handleAddToCart={handleAddToCart} addedItems={addedItems} activeCategory={activeCategory} />
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       <Footer />
@@ -221,7 +234,7 @@ const CategoryTab = ({ cat, activeCategory, setActiveCategory }) => {
         letterSpacing: "1.5px",
         cursor: "pointer",
         paddingBottom: "6px",
-        borderBottom: isActive || isHovered ? "2px solid #FF0000" : "2px solid transparent",
+        borderBottom: isActive || isHovered? "2px solid #FF0000" : "2px solid transparent",
         transition: "all 0.2s",
         flexShrink: 0
       }}
@@ -238,17 +251,17 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
     <div className="product-card" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
         <Link to={`/product/${product._id}`} state={{ fromCategory: activeCategory }}>
-          <img 
+          <img
             src={product.image}
-            alt={product.name} 
-            style={{ 
+            alt={product.name}
+            style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              transform: isHovered ? "scale(1.05)" : "scale(1)",
+              transform: isHovered? "scale(1.05)" : "scale(1)",
               objectPosition: "center",
               transition: "transform 0.4s ease"
-            }} 
+            }}
             onError={(e) => e.target.style.display = 'none'}
           />
         </Link>
@@ -260,19 +273,19 @@ const ProductCardReplit = ({ product, handleAddToCart, addedItems, activeCategor
             bottom: 0,
             left: 0,
             right: 0,
-            background: addedItems[product._id] ? "#16a34a" : "#FF0000",
+            background: addedItems[product._id]? "#16a34a" : "#FF0000",
             color: "#fff",
             padding: "1rem",
             textAlign: "center",
             fontSize: "0.7rem",
             fontWeight: "700",
             letterSpacing: "1.5px",
-            transform: isHovered ? "translateY(0)" : "translateY(100%)",
+            transform: isHovered? "translateY(0)" : "translateY(100%)",
             transition: "transform 0.3s ease",
             cursor: "pointer"
           }}
         >
-          {addedItems[product._id] ? 'ADDED ✓' : 'ADD TO CART'}
+          {addedItems[product._id]? 'ADDED ✓' : 'ADD TO CART'}
         </div>
       </div>
 
