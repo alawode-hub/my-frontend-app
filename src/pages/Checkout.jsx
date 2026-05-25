@@ -10,8 +10,9 @@ import { ClipLoader } from "react-spinners";
 
 function Checkout() {
   const cartItems = useSelector((state) => state.cartItems);
-  const shippingAddress = useSelector((state) => state.cartItems.shippingAddress || {});
+  const shippingAddress = useSelector((state) => state.shippingAddress);
   const { user } = useSelector((state) => state.auth);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
