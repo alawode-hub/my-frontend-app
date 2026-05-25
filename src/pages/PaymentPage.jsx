@@ -5,14 +5,15 @@ const handlePaystack = async () => {
       {
         email: user.email,
         amount: totalPrice, // in Naira
-        orderId: order._id
+        orderId: order._id,
+        callback_url: `${window.location.origin}/payment/verify` // ADD THIS
       },
       { headers: { Authorization: `Bearer ${user.token}` } }
     );
 
-    // Redirect user to Paystack payment page
     window.location.href = data.data.authorization_url;
   } catch (err) {
+    console.log(err.response?.data);
     toast.error("Payment initialization failed");
   }
 };
