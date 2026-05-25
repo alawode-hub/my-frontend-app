@@ -3,29 +3,29 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { clearCart } from "../redux/cartSlice";
+import { saveShippingAddress } from "../redux/cartSlice";
 import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
 function Checkout() {
-  const cartItems = useSelector((state) => state.cart.items || state.cartItems);
+  const cartItems = useSelector((state) => state.cartItems);
+  const shippingAddress = useSelector((state) => state.cartItems.shippingAddress || {});
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    fullName: "",
-    address: "",
-    city: "",
-    phone: ""
+    fullName: shippingAddress.fullName || "",
+    address: shippingAddress.address || "",
+    city: shippingAddress.city || "",
+    phone: shippingAddress.phone || ""
   });
   const [loading, setLoading] = useState(false);
 
-  const totalPrice = (cartItems || []).reduce(
-    (acc, item) => acc + item.price * item.qty,
-    0
-  );
+  const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
+  const shippingPrice = itemsPrice > 50000 ? 0 : 2000;
+  const totalPrice = itemsPrice + shippingPrice;
 
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value });
@@ -55,9 +55,10 @@ function Checkout() {
 
     setLoading(true);
     try {
+      dispatch(saveShippingAddress(form));
+
       const token = user.token;
 
-      // 1. Create order
       const { data: order } = await API.post("/orders", {
         orderItems: cartItems.map(item => ({
           name: item.name,
@@ -67,18 +68,20 @@ function Checkout() {
           product: item._id
         })),
         shippingAddress: form,
-        totalPrice: totalPrice,
+        itemsPrice,
+        shippingPrice,
+        totalPrice,
+        paymentMethod: "Paystack",
+        isPaid: false
       }, { headers: { Authorization: `Bearer ${token}` } });
 
-      // 2. Initialize Paystack
       const { data: payment } = await API.post("/payment/initialize", {
         email: user.email,
-        amount: totalPrice * 100,
+        amount: totalPrice,
         orderId: order._id,
         callback_url: `${window.location.origin}/payment/verify`
       }, { headers: { Authorization: `Bearer ${token}` } });
 
-      // 3. Redirect to Paystack
       window.location.href = payment.data.authorization_url;
 
     } catch (err) {
@@ -131,21 +134,15 @@ function Checkout() {
       `}</style>
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "4rem 2rem" }}>
-        <div style={{ marginBottom: "3rem" }}>
-          <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "0.5rem" }}>
-            CHECKOUT
-          </h1>
-          <div style={{ width: "40px", height: "3px", background: "#FF0000" }}></div>
-        </div>
+        <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "3rem" }}>
+          CHECKOUT
+        </h1>
 
         <form onSubmit={handleCheckout} className="checkout-layout">
-
-          {/* SHIPPING INFO - this was "not showing" */}
           <div>
             <h2 style={{ fontSize: "1rem", fontWeight: "700", letterSpacing: "1.5px", marginBottom: "2rem" }}>
               SHIPPING INFO
             </h2>
-
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               {[
                 { label: "Full Name", key: "fullName", type: "text" },
@@ -168,36 +165,30 @@ function Checkout() {
                     padding: "1rem",
                     fontSize: "0.9rem",
                     outline: "none",
-                    width: "100%",
-                    transition: "border 0.2s"
+                    width: "100%"
                   }}
-                  onFocus={(e) => e.target.style.border = "1px solid #FF0000"}
-                  onBlur={(e) => e.target.style.border = "1px solid #222"}
                 />
               ))}
             </div>
           </div>
 
-          {/* ORDER SUMMARY */}
           <div style={{ background: "#111", padding: "2rem", position: "sticky", top: "2rem", height: "fit-content" }}>
             <h2 style={{ fontSize: "1rem", fontWeight: "700", letterSpacing: "1.5px", marginBottom: "2rem" }}>
               ORDER SUMMARY
             </h2>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1rem" }}>
-              {cartItems.map((item, index) => (
-                <div key={item._id || index} style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "0.85rem",
-                  color: "#999",
-                  lineHeight: "1.4"
-                }}>
-                  <span style={{ paddingRight: "1rem" }}>{item.name} x {item.qty}</span>
-                  <span style={{ whiteSpace: "nowrap" }}>₦{(item.price * item.qty).toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
+            {cartItems.map((item, index) => (
+              <div key={item._id || index} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "0.85rem",
+                color: "#999",
+                marginBottom: "1rem"
+              }}>
+                <span>{item.name} x {item.qty}</span>
+                <span>₦{(item.price * item.qty).toLocaleString()}</span>
+              </div>
+            ))}
 
             <div style={{
               borderTop: "1px solid #222",
@@ -226,23 +217,14 @@ function Checkout() {
                 fontWeight: "700",
                 letterSpacing: "1.5px",
                 cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.5rem",
-                transition: "all 0.2s"
+                opacity: loading ? 0.7 : 1
               }}
-              onMouseEnter={(e) => { if(!loading) e.target.style.background = "#cc0000" }}
-              onMouseLeave={(e) => { if(!loading) e.target.style.background = "#FF0000" }}
             >
-              {loading ? <ClipLoader color="#fff" size={20} /> : null}
-              {loading ? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
+              {loading ? <ClipLoader color="#fff" size={20} /> : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
             </button>
           </div>
         </form>
       </div>
-
       <Footer />
     </div>
   );
