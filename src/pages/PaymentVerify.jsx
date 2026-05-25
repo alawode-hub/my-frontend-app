@@ -1,14 +1,12 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import API from "../services/api";
-import toast from "react-hot-toast";
 import { clearCart } from "../redux/cartSlice";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
-function PaymentVerify() {
+const PaymentVerify = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -16,26 +14,34 @@ function PaymentVerify() {
   useEffect(() => {
     const verifyPayment = async () => {
       const reference = searchParams.get("reference");
-
+      
       if (!reference) {
-        toast.error("NO PAYMENT REFERENCE FOUND");
+        toast.error("INVALID PAYMENT REFERENCE");
         navigate("/cart");
         return;
       }
 
       try {
-        const { data } = await API.get(`/payment/verify/${reference}`);
+        const token = JSON.parse(localStorage.getItem("user"))?.token;
+        const { data } = await API.get(`/payment/verify/${reference}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
 
         if (data.success) {
-          toast.success("PAYMENT SUCCESSFUL!");
-          dispatch(clearCart());
-          navigate("/orders");
+          dispatch(clearCart()); // clear cart in redux
+          localStorage.removeItem("cartItems"); // clear localStorage too
+          
+          toast.success("PAYMENT SUCCESSFUL 🔥");
+          
+          setTimeout(() => {
+            navigate("/shop"); // redirect to shop, not cart
+          }, 1500);
         } else {
           toast.error("PAYMENT FAILED");
           navigate("/cart");
         }
       } catch (err) {
-        console.log("VERIFY ERROR:", err.response?.data);
+        console.log(err);
         toast.error("PAYMENT VERIFICATION FAILED");
         navigate("/cart");
       }
@@ -45,23 +51,20 @@ function PaymentVerify() {
   }, [searchParams, navigate, dispatch]);
 
   return (
-    <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
-      <Navbar />
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "60vh",
-        gap: "1rem"
-      }}>
-        <ClipLoader color="#FF0000" size={50} />
-        <h2>VERIFYING PAYMENT...</h2>
-        <p style={{ color: "#888" }}>Please wait, do not close this page</p>
-      </div>
-      <Footer />
+    <div style={{ 
+      background: "#0a0a0a", 
+      color: "#fff", 
+      minHeight: "100vh", 
+      display: "flex", 
+      flexDirection: "column", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      gap: "1rem" 
+    }}>
+      <ClipLoader color="#FF0000" size={50} />
+      <p style={{ letterSpacing: "1px" }}>VERIFYING PAYMENT...</p>
     </div>
   );
-}
+};
 
 export default PaymentVerify;
