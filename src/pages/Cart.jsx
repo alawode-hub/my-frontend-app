@@ -13,7 +13,8 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const cartItems = useSelector((state) => state.cartItems);
+  // FIXED: read from state.cartItems with fallback
+  const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const { user } = useSelector((state) => state.auth);
 
   const [confirmAction, setConfirmAction] = useState(null);

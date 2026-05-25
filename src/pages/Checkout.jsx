@@ -9,8 +9,9 @@ import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
 function Checkout() {
-  const cartItems = useSelector((state) => state.cartItems);
-  const shippingAddress = useSelector((state) => state.cart.shippingAddress);
+  // FIXED: read from state.cartItems and state.cart.shippingAddress
+  const cartItems = useSelector((state) => state.cart?.cartItems || []);
+  const shippingAddress = useSelector((state) => state.cart?.shippingAddress || {});
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();

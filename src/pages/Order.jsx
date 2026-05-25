@@ -11,7 +11,8 @@ const API_URL = import.meta.env.VITE_API_URI;
 
 const Order = () => {
   const { user } = useSelector((state) => state.auth);
-  const cartItems = useSelector((state) => state.cartItems); // FIXED
+  // FIXED: read from state.cartItems
+  const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
