@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Order from "./pages/Order";
 import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentVerify from "./pages/PaymentVerify"; // ADD THIS
+import PaymentVerify from "./pages/PaymentVerify";
 
 function App() {
   return (
@@ -48,63 +48,21 @@ function App() {
         <Route path="/cart" element={<Cart />} />
 
         {/* PROTECTED ROUTES */}
-        <Route
-          path="/shop"
-          element={
-            <ProtectedRoute>
-              <Shop />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/order"
-          element={
-            <ProtectedRoute>
-              <Order />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/shop" element={<ProtectedRoute><Shop /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+        <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
 
         {/* PAYMENT ROUTES */}
-        <Route path="/payment/verify" element={<PaymentVerify />} /> {/* ADD THIS */}
-        <Route path="/payment-success" element={<PaymentSuccess />} /> {/* REMOVE PROTECTED */}
+        <Route path="/payment/verify" element={<PaymentVerify />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
 
         {/* PUBLIC ROUTES */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin" element={<ProtectedRoute adminOnly={true}><Admin /></ProtectedRoute>} />
 
         <Route path="*" element={<h1 style={{color: '#fff', textAlign: 'center', padding: '4rem'}}>404 - PAGE NOT FOUND</h1>} />
       </Routes>
