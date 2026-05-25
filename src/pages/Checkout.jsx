@@ -9,7 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
 function Checkout() {
-  const cartItems = useSelector((state) => state.cartItems);
+  const cartItems = useSelector((state) => state.cart.items || state.cartItems);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,14 +34,14 @@ function Checkout() {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.fullName || !form.address || !form.city || !form.phone) {
+    if (!form.fullName ||!form.address ||!form.city ||!form.phone) {
       toast.error("PLEASE FILL ALL SHIPPING FIELDS", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
       return;
     }
 
-    if (!user || !user._id) {
+    if (!user ||!user._id) {
       toast.error("PLEASE LOGIN FIRST", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
@@ -81,11 +81,12 @@ function Checkout() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      // 2. Initialize Paystack payment
+      // 2. Initialize Paystack payment with callback URL
       const { data: payment } = await API.post("/payment/initialize", {
         email: user.email,
         amount: totalPrice,
-        orderId: order._id
+        orderId: order._id,
+        callback_url: `${window.location.origin}/payment/verify` // ADD THIS
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -227,8 +228,8 @@ function Checkout() {
                 fontSize: "0.85rem",
                 fontWeight: "700",
                 letterSpacing: "1.5px",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
+                cursor: loading? "not-allowed" : "pointer",
+                opacity: loading? 0.7 : 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -238,8 +239,8 @@ function Checkout() {
               onMouseEnter={(e) => { if(!loading) e.target.style.background = "#cc0000" }}
               onMouseLeave={(e) => { if(!loading) e.target.style.background = "#FF0000" }}
             >
-              {loading ? <ClipLoader color="#fff" size={20} /> : null}
-              {loading ? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
+              {loading? <ClipLoader color="#fff" size={20} /> : null}
+              {loading? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
             </button>
           </div>
         </form>
