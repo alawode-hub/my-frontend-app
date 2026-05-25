@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ClipLoader } from "react-spinners";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URI;
 
@@ -13,7 +13,6 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
-  // FIXED selectors
   const cartItems = useSelector((state) => state.cartItems);
   const { user } = useSelector((state) => state.auth);
   
@@ -68,7 +67,6 @@ const Cart = () => {
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
-      <Toaster position="top-center" toastOptions={{ duration: 2500 }} />
       
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "4rem 2rem" }}>
         <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "2rem" }}>

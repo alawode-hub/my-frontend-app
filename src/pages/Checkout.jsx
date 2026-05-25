@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { saveShippingAddress } from "../redux/cartSlice";
 import API from "../services/api";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
 function Checkout() {
@@ -117,7 +117,6 @@ function Checkout() {
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
-      <Toaster position="top-center" duration={2500} />
       
       <style>{`
         .checkout-layout {
