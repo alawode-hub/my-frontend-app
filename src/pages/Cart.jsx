@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
+import { FaTrash } from "react-icons/fa"; // added
 
 const API_URL = import.meta.env.VITE_API_URI;
 
@@ -13,7 +14,6 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // FIXED: read from state.cartItems with fallback
   const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const { user } = useSelector((state) => state.auth);
 
@@ -95,7 +95,7 @@ const Cart = () => {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
             <div>
               {cartItems.map((item) => (
-                <div key={item._id} style={{ display: "flex", gap: "1rem", marginBottom: "2rem", borderBottom: "1px solid #222", paddingBottom: "2rem" }}>
+                <div key={item._id} style={{ display: "flex", gap: "1rem", marginBottom: "2rem", borderBottom: "1px solid #222", paddingBottom: "2rem", alignItems: "flex-start" }}>
                   <img
                     src={getFullImageUrl(item.image)}
                     alt={item.name}
@@ -105,16 +105,43 @@ const Cart = () => {
                     <h3>{item.name}</h3>
                     <p style={{ color: "#999" }}>₦{Number(item.price).toLocaleString()}</p>
                     <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginTop: "1rem" }}>
-                      <button onClick={() => handleUpdateQty(item._id, item.qty - 1)} disabled={item.qty <= 1}>-</button>
+                      <button 
+                        onClick={() => handleUpdateQty(item._id, item.qty - 1)} 
+                        disabled={item.qty <= 1}
+                        style={{ background: "#222", border: "none", color: "#fff", width: "30px", height: "30px", cursor: "pointer" }}
+                      >
+                        -
+                      </button>
                       <span>{item.qty}</span>
-                      <button onClick={() => handleUpdateQty(item._id, item.qty + 1)}>+</button>
-                      <button onClick={() => handleRemove(item._id)} style={{ color: "#FF0000" }}>Remove</button>
+                      <button 
+                        onClick={() => handleUpdateQty(item._id, item.qty + 1)}
+                        style={{ background: "#222", border: "none", color: "#fff", width: "30px", height: "30px", cursor: "pointer" }}
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
-                  <p style={{ fontWeight: "900" }}>₦{(item.qty * item.price).toLocaleString()}</p>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem" }}>
+                    <p style={{ fontWeight: "900", margin: 0 }}>₦{(item.qty * item.price).toLocaleString()}</p>
+                    <button 
+                      onClick={() => handleRemove(item._id)} 
+                      style={{ 
+                        background: "none", 
+                        border: "none", 
+                        color: "#FF0000", 
+                        cursor: "pointer", 
+                        fontSize: "18px",
+                        padding: "4px"
+                      }}
+                      title="Remove item"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
               ))}
-              <button onClick={handleClearCart} style={{ color: "#FF0000", background: "none", border: "none", cursor: "pointer" }}>CLEAR CART</button>
+              <button onClick={handleClearCart} style={{ color: "#FF0000", background: "none", border: "none", cursor: "pointer", fontWeight: "700" }}>CLEAR CART</button>
             </div>
 
             <div style={{ background: "#111", padding: "2rem", height: "fit-content" }}>
