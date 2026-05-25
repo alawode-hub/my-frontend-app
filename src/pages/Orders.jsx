@@ -14,7 +14,6 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useSelector((state) => state.auth);
 
-  // Helper for image URL
   const getFullImageUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
@@ -27,11 +26,9 @@ const Orders = () => {
         setLoading(false);
         return;
       }
-      
+
       try {
-        const config = {
-          headers: { Authorization: `Bearer ${user.token}` },
-        };
+        const config = { headers: { Authorization: `Bearer ${user.token}` } };
         const { data } = await axios.get(`${API_URL}/api/orders/myorders`, config);
         setOrders(data);
       } catch (error) {
@@ -43,7 +40,7 @@ const Orders = () => {
         setLoading(false);
       }
     };
-    
+
     fetchOrders();
   }, [user]);
 
@@ -67,7 +64,7 @@ const Orders = () => {
           MY ORDERS
         </h1>
 
-        {orders.length === 0 ? (
+        {orders.length === 0? (
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
             <p style={{ color: "#666", marginBottom: "1rem" }}>YOU HAVE NO ORDERS YET.</p>
             <Link to="/shop" style={{ background: "#FF0000", color: "#fff", padding: "0.75rem 1.5rem", textDecoration: "none", fontWeight: "700", letterSpacing: "1px" }}>
@@ -77,7 +74,7 @@ const Orders = () => {
         ) : (
           orders.map((order) => (
             <div key={order._id} style={{ border: "1px solid #333", padding: "1.5rem", marginBottom: "2rem", background: "#111" }}>
-              
+
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem", borderBottom: "1px solid #333", paddingBottom: "1rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
                   <p style={{ fontSize: "0.75rem", color: "#666", marginBottom: "0.25rem" }}>ORDER ID</p>
@@ -89,8 +86,8 @@ const Orders = () => {
                 </div>
                 <div>
                   <p style={{ fontSize: "0.75rem", color: "#666", marginBottom: "0.25rem" }}>STATUS</p>
-                  <p style={{ fontWeight: "700", color: order.isPaid ? "#16a34a" : "#FF0000", letterSpacing: "1px" }}>
-                    {order.isPaid ? "PAID" : "NOT PAID"}
+                  <p style={{ fontWeight: "700", color: order.isPaid? "#16a34a" : "#FF0000", letterSpacing: "1px" }}>
+                    {order.isPaid? "PAID" : "NOT PAID"}
                   </p>
                 </div>
               </div>
