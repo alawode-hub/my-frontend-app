@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Order from "./pages/Order";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentVerify from "./pages/PaymentVerify"; // ADD THIS
 
 function App() {
   return (
@@ -87,14 +88,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/payment-success"
-          element={
-            <ProtectedRoute>
-              <PaymentSuccess />
-            </ProtectedRoute>
-          }
-        />
+
+        {/* PAYMENT ROUTES */}
+        <Route path="/payment/verify" element={<PaymentVerify />} /> {/* ADD THIS */}
+        <Route path="/payment-success" element={<PaymentSuccess />} /> {/* REMOVE PROTECTED */}
 
         {/* PUBLIC ROUTES */}
         <Route path="/login" element={<Login />} />
