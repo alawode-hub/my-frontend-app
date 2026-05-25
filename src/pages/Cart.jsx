@@ -13,6 +13,7 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
+  // FIXED: read from state.cartItems
   const cartItems = useSelector((state) => state.cartItems);
   const { user } = useSelector((state) => state.auth);
   
