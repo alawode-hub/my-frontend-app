@@ -5,7 +5,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ClipLoader } from "react-spinners";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast"; 
 
 const API_URL = import.meta.env.VITE_API_URI;
 
@@ -57,7 +57,6 @@ const Orders = () => {
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
-      <Toaster position="top-center" duration={2500} />
 
       <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "3rem 2rem" }}>
         <h1 style={{ fontSize: "2rem", fontWeight: "900", marginBottom: "2rem", letterSpacing: "2px" }}>

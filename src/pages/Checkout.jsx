@@ -9,11 +9,10 @@ import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
 function Checkout() {
-  // FIXED: read from state.cartItems
   const cartItems = useSelector((state) => state.cartItems);
   const shippingAddress = useSelector((state) => state.cart.shippingAddress);
   const { user } = useSelector((state) => state.auth);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,7 +25,7 @@ function Checkout() {
   const [loading, setLoading] = useState(false);
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shippingPrice = itemsPrice > 50000 ? 0 : 2000;
+  const shippingPrice = itemsPrice > 50000? 0 : 2000;
   const totalPrice = itemsPrice + shippingPrice;
 
   const handleChange = (e) => {
@@ -36,12 +35,12 @@ function Checkout() {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.fullName || !form.address || !form.city || !form.phone) {
+    if (!form.fullName ||!form.address ||!form.city ||!form.phone) {
       toast.error("PLEASE FILL ALL SHIPPING FIELDS");
       return;
     }
 
-    if (!user || !user._id) {
+    if (!user ||!user._id) {
       toast.error("PLEASE LOGIN FIRST");
       setTimeout(() => navigate("/login"), 1000);
       return;
@@ -118,16 +117,16 @@ function Checkout() {
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
-      
+
       <style>{`
-        .checkout-layout {
+       .checkout-layout {
           display: grid;
           grid-template-columns: 2fr 1fr;
           gap: 4rem;
           align-items: start;
         }
         @media (max-width: 900px) {
-          .checkout-layout {
+         .checkout-layout {
             grid-template-columns: 1fr;
             gap: 2rem;
           }
@@ -217,11 +216,11 @@ function Checkout() {
                 fontSize: "0.85rem",
                 fontWeight: "700",
                 letterSpacing: "1.5px",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1
+                cursor: loading? "not-allowed" : "pointer",
+                opacity: loading? 0.7 : 1
               }}
             >
-              {loading ? <ClipLoader color="#fff" size={20} /> : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
+              {loading? <ClipLoader color="#fff" size={20} /> : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
             </button>
           </div>
         </form>

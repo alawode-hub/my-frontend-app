@@ -12,11 +12,10 @@ const API_URL = import.meta.env.VITE_API_URI;
 const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
-  // FIXED: read from state.cartItems
+
   const cartItems = useSelector((state) => state.cartItems);
   const { user } = useSelector((state) => state.auth);
-  
+
   const [confirmAction, setConfirmAction] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -68,7 +67,7 @@ const Cart = () => {
   return (
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
-      
+
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "4rem 2rem" }}>
         <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "2rem" }}>
           YOUR CART ({cartItems.length})
@@ -86,7 +85,7 @@ const Cart = () => {
           </div>
         )}
 
-        {cartItems.length === 0 ? (
+        {cartItems.length === 0? (
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
             <p style={{ fontSize: "1.2rem", color: "#666", marginBottom: "2rem" }}>Your cart is empty</p>
             <Link to="/shop" style={{ background: "#FF0000", color: "#fff", padding: "1rem 2rem", textDecoration: "none", fontWeight: "700" }}>CONTINUE SHOPPING</Link>
@@ -96,10 +95,10 @@ const Cart = () => {
             <div>
               {cartItems.map((item) => (
                 <div key={item._id} style={{ display: "flex", gap: "1rem", marginBottom: "2rem", borderBottom: "1px solid #222", paddingBottom: "2rem" }}>
-                  <img 
-                    src={getFullImageUrl(item.image)} 
-                    alt={item.name} 
-                    style={{ width: "80px", height: "100px", objectFit: "cover" }} 
+                  <img
+                    src={getFullImageUrl(item.image)}
+                    alt={item.name}
+                    style={{ width: "80px", height: "100px", objectFit: "cover" }}
                   />
                   <div style={{ flex: 1 }}>
                     <h3>{item.name}</h3>
@@ -124,7 +123,7 @@ const Cart = () => {
                 <span>₦{total.toLocaleString()}</span>
               </div>
               <button onClick={handleCheckout} disabled={loading} style={{ width: "100%", background: "#FF0000", color: "#fff", padding: "1rem", border: "none", cursor: "pointer" }}>
-                {loading ? <ClipLoader size={20} color="#fff" /> : "CHECKOUT"}
+                {loading? <ClipLoader size={20} color="#fff" /> : "CHECKOUT"}
               </button>
             </div>
           </div>
