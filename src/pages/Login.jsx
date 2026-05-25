@@ -7,10 +7,7 @@ import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,16 +29,17 @@ const Login = () => {
     }
     
     if (successMessage && user) {
-      toast.success(successMessage.toUpperCase());
-      dispatch(resetSuccess());
+      toast.success(successMessage.toUpperCase(), { duration: 2000 });
       
+      // wait 2s for toast to show, then navigate and reset
       setTimeout(() => {
+        dispatch(resetSuccess());
         if (user.role === "admin") {
           navigate("/admin");
         } else {
           navigate("/shop");
         }
-      }, 1500);
+      }, 2000);
     }
   }, [error, successMessage, user, navigate, dispatch]);
 
@@ -49,7 +47,6 @@ const Login = () => {
     <div className="auth-page">
       <div className="auth-box">
         <h2>LOGIN</h2>
-
         <form onSubmit={handleSubmit}>
           <input
             type="email"

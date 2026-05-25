@@ -1,17 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Use env variable. Add VITE_API_URI=https://mk-backend-1ues.onrender.com to Vercel
 const API_URL = import.meta.env.VITE_API_URI;
 
-// 1. REGISTER USER THUNK
 export const registerUser = createAsyncThunk(
   "auth/register",
   async (userData, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: { "Content-Type": "application/json" },
-      };
+      const config = { headers: { "Content-Type": "application/json" } };
       const { data } = await axios.post(`${API_URL}/api/users/register`, userData, config);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
@@ -21,14 +17,11 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// 2. LOGIN USER THUNK
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (userData, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: { "Content-Type": "application/json" },
-      };
+      const config = { headers: { "Content-Type": "application/json" } };
       const { data } = await axios.post(`${API_URL}/api/users/login`, userData, config);
       localStorage.setItem("user", JSON.stringify(data));
       return data;
@@ -38,7 +31,6 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// 3. UPDATE PROFILE THUNK
 export const updateUserProfile = createAsyncThunk(
   "auth/updateProfile",
   async (userData, { rejectWithValue, getState }) => {
@@ -92,7 +84,7 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.successMessage = "Registration successful";
+        state.successMessage = "REGISTRATION SUCCESSFUL";
         localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -108,7 +100,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.successMessage = "Login successful";
+        state.successMessage = "LOGIN SUCCESSFUL";
         localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -122,6 +114,7 @@ const authSlice = createSlice({
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.successMessage = "PROFILE UPDATED";
         localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(updateUserProfile.rejected, (state, action) => {

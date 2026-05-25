@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerUser, resetError, resetSuccess } from "../redux/authSlice";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
-import toast from "react-hot-toast"; // removed Toaster import
+import toast from "react-hot-toast";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -33,9 +33,12 @@ const Register = () => {
       dispatch(resetError());
     }
     if (successMessage) {
-      toast.success(successMessage.toUpperCase());
-      dispatch(resetSuccess());
-      setTimeout(() => navigate("/login"), 1500);
+      toast.success(successMessage.toUpperCase(), { duration: 2000 });
+      
+      setTimeout(() => {
+        dispatch(resetSuccess());
+        navigate("/login");
+      }, 2000);
     }
   }, [error, successMessage, navigate, dispatch]);
 
@@ -43,7 +46,6 @@ const Register = () => {
     <div className="auth-page">
       <div className="auth-box">
         <h2>REGISTER</h2>
-
         <form onSubmit={handleSubmit}>
           <input
             type="text"
