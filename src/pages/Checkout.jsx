@@ -35,16 +35,12 @@ function Checkout() {
     e.preventDefault();
 
     if (!form.fullName ||!form.address ||!form.city ||!form.phone) {
-      toast.error("PLEASE FILL ALL SHIPPING FIELDS", {
-        style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
-      });
+      toast.error("PLEASE FILL ALL SHIPPING FIELDS");
       return;
     }
 
     if (!user ||!user._id) {
-      toast.error("PLEASE LOGIN FIRST", {
-        style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
-      });
+      toast.error("PLEASE LOGIN FIRST");
       setTimeout(() => navigate("/login"), 1000);
       return;
     }
@@ -61,7 +57,7 @@ function Checkout() {
     try {
       const token = user.token;
 
-      // 1. Create order with isPaid: false
+      // 1. Create order
       const { data: order } = await API.post("/orders", {
         orderItems: cartItems.map(item => ({
           name: item.name,
@@ -70,35 +66,24 @@ function Checkout() {
           price: item.price,
           product: item._id
         })),
-        shippingAddress: {
-          fullName: form.fullName,
-          address: form.address,
-          city: form.city,
-          phone: form.phone
-        },
+        shippingAddress: form,
         totalPrice: totalPrice,
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
 
-      // 2. Initialize Paystack payment with callback URL
+      // 2. Initialize Paystack
       const { data: payment } = await API.post("/payment/initialize", {
         email: user.email,
-        amount: totalPrice,
+        amount: totalPrice * 100, // Paystack uses kobo
         orderId: order._id,
-        callback_url: `${window.location.origin}/payment/verify` // ADD THIS
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+        callback_url: `${window.location.origin}/payment/verify`
+      }, { headers: { Authorization: `Bearer ${token}` } });
 
       // 3. Redirect to Paystack
       window.location.href = payment.data.authorization_url;
 
     } catch (err) {
       console.log("CHECKOUT ERROR:", err.response?.data);
-      toast.error(err.response?.data?.message || "CHECKOUT FAILED. TRY AGAIN", {
-        style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
-      });
+      toast.error(err.response?.data?.message || "CHECKOUT FAILED. TRY AGAIN");
       setLoading(false);
     }
   };
@@ -131,12 +116,9 @@ function Checkout() {
       <Toaster position="top-center" duration={2500} />
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "4rem 2rem" }}>
-        <div style={{ marginBottom: "3rem" }}>
-          <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "0.5rem" }}>
-            CHECKOUT
-          </h1>
-          <div style={{ width: "40px", height: "3px", background: "#FF0000" }}></div>
-        </div>
+        <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "3rem" }}>
+          CHECKOUT
+        </h1>
 
         <form onSubmit={handleCheckout} style={{
           display: "grid",
@@ -172,11 +154,8 @@ function Checkout() {
                     padding: "1rem",
                     fontSize: "0.9rem",
                     outline: "none",
-                    width: "100%",
-                    transition: "border 0.2s"
+                    width: "100%"
                   }}
-                  onFocus={(e) => e.target.style.border = "1px solid #FF0000"}
-                  onBlur={(e) => e.target.style.border = "1px solid #222"}
                 />
               ))}
             </div>
@@ -187,20 +166,18 @@ function Checkout() {
               ORDER SUMMARY
             </h2>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1rem" }}>
-              {cartItems.map((item, index) => (
-                <div key={item._id || `cart-item-${index}`} style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "0.85rem",
-                  color: "#999",
-                  lineHeight: "1.4"
-                }}>
-                  <span style={{ paddingRight: "1rem" }}>{item.name} x {item.qty}</span>
-                  <span style={{ whiteSpace: "nowrap" }}>₦{(item.price * item.qty).toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
+            {cartItems.map((item, index) => (
+              <div key={item._id || index} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "0.85rem",
+                color: "#999",
+                marginBottom: "1rem"
+              }}>
+                <span>{item.name} x {item.qty}</span>
+                <span>₦{(item.price * item.qty).toLocaleString()}</span>
+              </div>
+            ))}
 
             <div style={{
               borderTop: "1px solid #222",
@@ -233,11 +210,8 @@ function Checkout() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "0.5rem",
-                transition: "all 0.2s"
+                gap: "0.5rem"
               }}
-              onMouseEnter={(e) => { if(!loading) e.target.style.background = "#cc0000" }}
-              onMouseLeave={(e) => { if(!loading) e.target.style.background = "#FF0000" }}
             >
               {loading? <ClipLoader color="#fff" size={20} /> : null}
               {loading? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
