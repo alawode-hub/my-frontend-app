@@ -34,12 +34,12 @@ function Checkout() {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.fullName ||!form.address ||!form.city ||!form.phone) {
+    if (!form.fullName || !form.address || !form.city || !form.phone) {
       toast.error("PLEASE FILL ALL SHIPPING FIELDS");
       return;
     }
 
-    if (!user ||!user._id) {
+    if (!user || !user._id) {
       toast.error("PLEASE LOGIN FIRST");
       setTimeout(() => navigate("/login"), 1000);
       return;
@@ -73,7 +73,7 @@ function Checkout() {
       // 2. Initialize Paystack
       const { data: payment } = await API.post("/payment/initialize", {
         email: user.email,
-        amount: totalPrice * 100, // Paystack uses kobo
+        amount: totalPrice * 100,
         orderId: order._id,
         callback_url: `${window.location.origin}/payment/verify`
       }, { headers: { Authorization: `Bearer ${token}` } });
@@ -114,19 +114,33 @@ function Checkout() {
     <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
       <Toaster position="top-center" duration={2500} />
+      
+      <style>{`
+        .checkout-layout {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 4rem;
+          align-items: start;
+        }
+        @media (max-width: 900px) {
+          .checkout-layout {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
+        }
+      `}</style>
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "4rem 2rem" }}>
-        <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "3rem" }}>
-          CHECKOUT
-        </h1>
+        <div style={{ marginBottom: "3rem" }}>
+          <h1 style={{ fontSize: "2rem", fontWeight: "900", letterSpacing: "2px", marginBottom: "0.5rem" }}>
+            CHECKOUT
+          </h1>
+          <div style={{ width: "40px", height: "3px", background: "#FF0000" }}></div>
+        </div>
 
-        <form onSubmit={handleCheckout} style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr",
-          gap: "4rem",
-          alignItems: "start"
-        }} className="checkout-layout">
+        <form onSubmit={handleCheckout} className="checkout-layout">
 
+          {/* SHIPPING INFO - this was "not showing" */}
           <div>
             <h2 style={{ fontSize: "1rem", fontWeight: "700", letterSpacing: "1.5px", marginBottom: "2rem" }}>
               SHIPPING INFO
@@ -154,30 +168,36 @@ function Checkout() {
                     padding: "1rem",
                     fontSize: "0.9rem",
                     outline: "none",
-                    width: "100%"
+                    width: "100%",
+                    transition: "border 0.2s"
                   }}
+                  onFocus={(e) => e.target.style.border = "1px solid #FF0000"}
+                  onBlur={(e) => e.target.style.border = "1px solid #222"}
                 />
               ))}
             </div>
           </div>
 
-          <div style={{ background: "#111", padding: "2rem", position: "sticky", top: "2rem" }}>
+          {/* ORDER SUMMARY */}
+          <div style={{ background: "#111", padding: "2rem", position: "sticky", top: "2rem", height: "fit-content" }}>
             <h2 style={{ fontSize: "1rem", fontWeight: "700", letterSpacing: "1.5px", marginBottom: "2rem" }}>
               ORDER SUMMARY
             </h2>
 
-            {cartItems.map((item, index) => (
-              <div key={item._id || index} style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: "0.85rem",
-                color: "#999",
-                marginBottom: "1rem"
-              }}>
-                <span>{item.name} x {item.qty}</span>
-                <span>₦{(item.price * item.qty).toLocaleString()}</span>
-              </div>
-            ))}
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1rem" }}>
+              {cartItems.map((item, index) => (
+                <div key={item._id || index} style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: "0.85rem",
+                  color: "#999",
+                  lineHeight: "1.4"
+                }}>
+                  <span style={{ paddingRight: "1rem" }}>{item.name} x {item.qty}</span>
+                  <span style={{ whiteSpace: "nowrap" }}>₦{(item.price * item.qty).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
 
             <div style={{
               borderTop: "1px solid #222",
@@ -205,16 +225,19 @@ function Checkout() {
                 fontSize: "0.85rem",
                 fontWeight: "700",
                 letterSpacing: "1.5px",
-                cursor: loading? "not-allowed" : "pointer",
-                opacity: loading? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "0.5rem"
+                gap: "0.5rem",
+                transition: "all 0.2s"
               }}
+              onMouseEnter={(e) => { if(!loading) e.target.style.background = "#cc0000" }}
+              onMouseLeave={(e) => { if(!loading) e.target.style.background = "#FF0000" }}
             >
-              {loading? <ClipLoader color="#fff" size={20} /> : null}
-              {loading? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
+              {loading ? <ClipLoader color="#fff" size={20} /> : null}
+              {loading ? "PROCESSING..." : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
             </button>
           </div>
         </form>
