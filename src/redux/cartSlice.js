@@ -1,17 +1,35 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const getUserShippingKey = () => {
+const getUserId = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  return user?._id ? `shippingAddress_${user._id}` : "shippingAddress_guest";
+  return user?._id || "guest";
+};
+
+const getUserShippingKey = () => `shippingAddress_${getUserId()}`;
+
+const getCartItems = () => {
+  try {
+    const items = localStorage.getItem("cartItems");
+    return items ? JSON.parse(items) : [];
+  } catch {
+    return [];
+  }
+};
+
+const getUserShipping = () => {
+  try {
+    const shipping = localStorage.getItem(getUserShippingKey());
+    return shipping ? JSON.parse(shipping) : {};
+  } catch {
+    return {};
+  }
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    cartItems: localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [],
-    shippingAddress: localStorage.getItem(getUserShippingKey()) 
-      ? JSON.parse(localStorage.getItem(getUserShippingKey())) 
-      : {},
+    cartItems: getCartItems(),
+    shippingAddress: getUserShipping(),
   },
   reducers: {
     addToCart: (state, action) => {
@@ -40,7 +58,9 @@ const cartSlice = createSlice({
     },
     clearCart: (state) => {
       state.cartItems = [];
+      state.shippingAddress = {};
       localStorage.removeItem("cartItems");
+      localStorage.removeItem(getUserShippingKey()); // Clear current user shipping
     },
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
@@ -50,7 +70,7 @@ const cartSlice = createSlice({
       state.cartItems = [];
       state.shippingAddress = {};
       localStorage.removeItem("cartItems");
-      // Don't remove shipping here - keep per user
+      localStorage.removeItem(getUserShippingKey());
     },
   },
 });

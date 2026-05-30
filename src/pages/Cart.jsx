@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, clearCart, updateQty } from "../redux/cartSlice";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
-import { FaTrash } from "react-icons/fa"; // added
+import { FaTrash } from "react-icons/fa";
 
 const API_URL = import.meta.env.VITE_API_URI;
 
@@ -19,6 +19,16 @@ const Cart = () => {
 
   const [confirmAction, setConfirmAction] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // FORCE SYNC WITH LOCALSTORAGE
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cartItems");
+    if (!storedCart || storedCart === "[]") {
+      if (cartItems.length > 0) {
+        dispatch(clearCart());
+      }
+    }
+  }, [cartItems, dispatch]);
 
   const getFullImageUrl = (url) => {
     if (!url) return "";
@@ -86,7 +96,7 @@ const Cart = () => {
           </div>
         )}
 
-        {cartItems.length === 0? (
+        {cartItems.length === 0 ? (
           <div style={{ textAlign: "center", padding: "4rem 0" }}>
             <p style={{ fontSize: "1.2rem", color: "#666", marginBottom: "2rem" }}>Your cart is empty</p>
             <Link to="/shop" style={{ background: "#FF0000", color: "#fff", padding: "1rem 2rem", textDecoration: "none", fontWeight: "700" }}>CONTINUE SHOPPING</Link>
@@ -151,7 +161,7 @@ const Cart = () => {
                 <span>₦{total.toLocaleString()}</span>
               </div>
               <button onClick={handleCheckout} disabled={loading} style={{ width: "100%", background: "#FF0000", color: "#fff", padding: "1rem", border: "none", cursor: "pointer" }}>
-                {loading? <ClipLoader size={20} color="#fff" /> : "CHECKOUT"}
+                {loading ? <ClipLoader size={20} color="#fff" /> : "CHECKOUT"}
               </button>
             </div>
           </div>

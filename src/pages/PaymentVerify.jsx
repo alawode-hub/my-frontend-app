@@ -28,7 +28,7 @@ const PaymentVerify = () => {
         });
 
         if (data.success) {
-          dispatch(clearCart()); // This clears cartItems + shippingAddress per user
+          dispatch(clearCart()); // This clears cart + shipping for current user
           toast.success("PAYMENT SUCCESSFUL 🔥");
 
           setTimeout(() => {
