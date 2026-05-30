@@ -14,10 +14,10 @@ const PaymentVerify = () => {
   useEffect(() => {
     const verifyPayment = async () => {
       const reference = searchParams.get("reference");
-      
+
       if (!reference) {
         toast.error("INVALID PAYMENT REFERENCE");
-        navigate("/cart");
+        navigate("/cart", { replace: true });
         return;
       }
 
@@ -28,22 +28,22 @@ const PaymentVerify = () => {
         });
 
         if (data.success) {
-          dispatch(clearCart()); // clear cart in redux
-          localStorage.removeItem("cartItems"); // clear localStorage too
-          
+          dispatch(clearCart());
+          localStorage.removeItem("cartItems");
+
           toast.success("PAYMENT SUCCESSFUL 🔥");
-          
+
           setTimeout(() => {
-            navigate("/shop"); // redirect to shop, not cart
-          }, 1500);
+            navigate("/payment-success", { replace: true }); // go to success page
+          }, 1000);
         } else {
           toast.error("PAYMENT FAILED");
-          navigate("/cart");
+          navigate("/cart", { replace: true });
         }
       } catch (err) {
         console.log(err);
         toast.error("PAYMENT VERIFICATION FAILED");
-        navigate("/cart");
+        navigate("/cart", { replace: true });
       }
     };
 
@@ -51,15 +51,15 @@ const PaymentVerify = () => {
   }, [searchParams, navigate, dispatch]);
 
   return (
-    <div style={{ 
-      background: "#0a0a0a", 
-      color: "#fff", 
-      minHeight: "100vh", 
-      display: "flex", 
-      flexDirection: "column", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      gap: "1rem" 
+    <div style={{
+      background: "#0a0a0a",
+      color: "#fff",
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "1rem"
     }}>
       <ClipLoader color="#FF0000" size={50} />
       <p style={{ letterSpacing: "1px" }}>VERIFYING PAYMENT...</p>
