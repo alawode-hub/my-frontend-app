@@ -13,7 +13,6 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    dispatch(resetCart()); //TO CLEAR CART  SHIPPING ON LOGOUT
     toast.success("LOGGED OUT SUCCESSFULLY");
     navigate("/login");
     setShowModal(false);
