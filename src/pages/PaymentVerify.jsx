@@ -15,6 +15,8 @@ const PaymentVerify = () => {
     const verifyPayment = async () => {
       const reference = searchParams.get("reference");
 
+      console.log("PAYMENT VERIFY START - REFERENCE:", reference); // DEBUG
+
       if (!reference) {
         toast.error("INVALID PAYMENT REFERENCE");
         navigate("/cart", { replace: true });
@@ -22,24 +24,38 @@ const PaymentVerify = () => {
       }
 
       try {
-        const token = JSON.parse(localStorage.getItem("user"))?.token;
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = user?.token;
+
+        console.log("PAYMENT VERIFY - USER ID:", user?._id); // DEBUG
+        console.log("PAYMENT VERIFY - TOKEN EXISTS:",!!token); // DEBUG
+
         const { data } = await API.get(`/payment/verify/${reference}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
+        console.log("PAYMENT VERIFY RESPONSE:", data); // DEBUG
+
         if (data.success) {
-          dispatch(clearCart()); // This clears cart + shipping for current user
+          console.log("BEFORE CLEARCART - CART LS:", localStorage.getItem("cartItems")); // DEBUG
+
+          dispatch(clearCart());
+
+          console.log("AFTER CLEARCART - CART LS:", localStorage.getItem("cartItems")); // DEBUG
+          console.log("AFTER CLEARCART - SHIPPING LS:", localStorage.getItem(`shippingAddress_${user?._id}`)); // DEBUG
+
           toast.success("PAYMENT SUCCESSFUL 🔥");
 
           setTimeout(() => {
             navigate("/payment-success", { replace: true });
+            window.location.reload(); // FORCE RELOAD TO CLEAR CART STATE
           }, 1000);
         } else {
           toast.error("PAYMENT FAILED");
           navigate("/cart", { replace: true });
         }
       } catch (err) {
-        console.log(err);
+        console.log("PAYMENT VERIFY ERROR:", err);
         toast.error("PAYMENT VERIFICATION FAILED");
         navigate("/cart", { replace: true });
       }
