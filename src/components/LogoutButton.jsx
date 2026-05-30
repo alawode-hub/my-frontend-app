@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
+import { resetCart } from "../redux/cartSlice"; 
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -12,6 +13,7 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
+    dispatch(resetCart()); //TO CLEAR CART  SHIPPING ON LOGOUT
     toast.success("LOGGED OUT SUCCESSFULLY");
     navigate("/login");
     setShowModal(false);

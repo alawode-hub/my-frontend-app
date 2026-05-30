@@ -3,8 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    cartItems: JSON.parse(localStorage.getItem("cartItems")) || [],
-    shippingAddress: JSON.parse(localStorage.getItem("shippingAddress")) || {},
+    cartItems: localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [],
+    shippingAddress: localStorage.getItem("shippingAddress") ? JSON.parse(localStorage.getItem("shippingAddress")) : {},
   },
   reducers: {
     addToCart: (state, action) => {
@@ -33,14 +33,22 @@ const cartSlice = createSlice({
     },
     clearCart: (state) => {
       state.cartItems = [];
-      localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+      state.shippingAddress = {}; // ADDED: Clear shipping too
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("shippingAddress"); // ADDED: Remove shipping too
     },
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
       localStorage.setItem("shippingAddress", JSON.stringify(state.shippingAddress));
     },
+    resetCart: (state) => { // ADDED: For logout
+      state.cartItems = [];
+      state.shippingAddress = {};
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("shippingAddress");
+    },
   },
 });
 
-export const { addToCart, removeFromCart, updateQty, clearCart, saveShippingAddress } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQty, clearCart, saveShippingAddress, resetCart } = cartSlice.actions;
 export default cartSlice.reducer;

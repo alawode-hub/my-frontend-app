@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -9,7 +9,6 @@ import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 
 function Checkout() {
-  // FIXED: read from state.cartItems and state.cart.shippingAddress
   const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const shippingAddress = useSelector((state) => state.cart?.shippingAddress || {});
   const { user } = useSelector((state) => state.auth);
@@ -18,15 +17,25 @@ function Checkout() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    fullName: shippingAddress.fullName || "",
-    address: shippingAddress.address || "",
-    city: shippingAddress.city || "",
-    phone: shippingAddress.phone || ""
+    fullName: "",
+    address: "",
+    city: "",
+    phone: ""
   });
   const [loading, setLoading] = useState(false);
 
+  // ADDED: Reset form when shippingAddress or user changes
+  useEffect(() => {
+    setForm({
+      fullName: shippingAddress.fullName || "",
+      address: shippingAddress.address || "",
+      city: shippingAddress.city || "",
+      phone: shippingAddress.phone || ""
+    });
+  }, [shippingAddress, user?._id]);
+
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shippingPrice = itemsPrice > 50000? 0 : 2000;
+  const shippingPrice = itemsPrice > 50000 ? 0 : 2000;
   const totalPrice = itemsPrice + shippingPrice;
 
   const handleChange = (e) => {
@@ -36,12 +45,12 @@ function Checkout() {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!form.fullName ||!form.address ||!form.city ||!form.phone) {
+    if (!form.fullName || !form.address || !form.city || !form.phone) {
       toast.error("PLEASE FILL ALL SHIPPING FIELDS");
       return;
     }
 
-    if (!user ||!user._id) {
+    if (!user || !user._id) {
       toast.error("PLEASE LOGIN FIRST");
       setTimeout(() => navigate("/login"), 1000);
       return;
@@ -217,11 +226,11 @@ function Checkout() {
                 fontSize: "0.85rem",
                 fontWeight: "700",
                 letterSpacing: "1.5px",
-                cursor: loading? "not-allowed" : "pointer",
-                opacity: loading? 0.7 : 1
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1
               }}
             >
-              {loading? <ClipLoader color="#fff" size={20} /> : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
+              {loading ? <ClipLoader color="#fff" size={20} /> : `PAY NOW - ₦${totalPrice.toLocaleString()}`}
             </button>
           </div>
         </form>
