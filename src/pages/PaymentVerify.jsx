@@ -28,13 +28,11 @@ const PaymentVerify = () => {
         });
 
         if (data.success) {
-          dispatch(clearCart());
-          localStorage.removeItem("cartItems");
-
+          dispatch(clearCart()); // This clears cartItems + shippingAddress per user
           toast.success("PAYMENT SUCCESSFUL 🔥");
 
           setTimeout(() => {
-            navigate("/payment-success", { replace: true }); // go to success page
+            navigate("/payment-success", { replace: true });
           }, 1000);
         } else {
           toast.error("PAYMENT FAILED");
