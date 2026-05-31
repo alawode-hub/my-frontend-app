@@ -43,7 +43,6 @@ function Admin() {
     fetchData();
   }, [user, navigate]);
 
-  // Helper to make sure image URL is absolute
   const getFullImageUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
@@ -58,9 +57,8 @@ function Admin() {
         API.get("/orders")
       ]);
 
-      // Fix image URLs for products
       const fixedProducts = productsRes.data.map(p => ({
-      ...p,
+       ...p,
         image: getFullImageUrl(p.image)
       }));
 
@@ -100,9 +98,28 @@ function Admin() {
     return Number(cleaned);
   };
 
+  // FULL IMAGE VALIDATION 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    //  ONLY IMAGES
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error("ONLY JPG, JPEG, PNG, WEBP IMAGES ALLOWED ❌");
+      e.target.value = "";
+      setErrors({...errors, image: "Invalid file type. Only images allowed" });
+      return;
+    }
+
+    // CHECK FILE SIZE 
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("IMAGE TOO LARGE. MAX 5MB ALLOWED ❌");
+      e.target.value = "";
+      setErrors({...errors, image: "File too large. Max 5MB" });
+      return;
+    }
 
     const formData = new FormData();
     formData.append('image', file);
@@ -123,6 +140,7 @@ function Admin() {
       toast.error(errorMsg);
       setErrors({...errors, image: errorMsg });
       setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -178,7 +196,7 @@ function Admin() {
 
     try {
       const productData = {
-      ...form,
+       ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -382,8 +400,13 @@ function Admin() {
 
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#777' }}>Product Image</label>
-                  <input type="file" onChange={uploadFileHandler} accept="image/*" disabled={uploading}
-                    style={{ background: '#1a1a1a', border: 'none', borderBottom: errors.image? '2px solid #ff0000' : '2px solid #333', padding: '12px 0', color: '#fff', width: '100%' }} />
+                  <input
+                    type="file"
+                    onChange={uploadFileHandler}
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    disabled={uploading}
+                    style={{ background: '#1a1a1a', border: 'none', borderBottom: errors.image? '2px solid #ff0000' : '2px solid #333', padding: '12px 0', color: '#fff', width: '100%' }}
+                  />
                   {uploading && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.5rem', color: '#777' }}>
                       <ClipLoader size={16} color="#FF0000" />
