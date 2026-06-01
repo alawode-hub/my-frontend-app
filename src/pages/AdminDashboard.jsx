@@ -23,6 +23,7 @@ function Admin() {
   const [confirmAction, setConfirmAction] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [toast, setToast] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -45,6 +46,13 @@ function Admin() {
     fetchData();
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   const getFullImageUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
@@ -60,7 +68,7 @@ function Admin() {
       ]);
 
       const fixedProducts = productsRes.data.map(p => ({
-     ...p,
+    ...p,
         image: getFullImageUrl(p.image)
       }));
 
@@ -68,7 +76,7 @@ function Admin() {
       setOrders(ordersRes.data);
     } catch (err) {
       console.error(err);
-      alert("FAILED TO LOAD DATA");
+      setToast({ type: 'error', message: 'FAILED TO LOAD DATA' });
     } finally {
       setLoading(false);
     }
@@ -84,7 +92,7 @@ function Admin() {
 
   const parsePrice = (priceString) => {
     if (!priceString) return 0;
-    let cleaned = priceString.toString().toLowerCase().replace(/[$,\s]/g, '');
+    let cleaned = priceString.toString().lowerCase().replace(/[$,\s]/g, '');
     if (cleaned.includes('k')) {
       cleaned = cleaned.replace('k', '');
       return Number(cleaned) * 1000;
@@ -106,7 +114,7 @@ function Admin() {
       setForm({...form, image: imageUrl });
       setUploading(false);
     } catch (error) {
-      alert("IMAGE UPLOAD FAILED");
+      setToast({ type: 'error', message: 'IMAGE UPLOAD FAILED' });
       setUploading(false);
       e.target.value = "";
     }
@@ -162,7 +170,7 @@ function Admin() {
     e.preventDefault();
 
     if (!validateForm()) {
-      alert("FIX ERRORS");
+      setToast({ type: 'error', message: 'FIX ERRORS' });
       return;
     }
 
@@ -170,23 +178,23 @@ function Admin() {
 
     try {
       const productData = {
-     ...form,
+    ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
 
       if (editingProduct) {
         await API.put(`/products/${editingProduct}`, productData);
-        alert("PRODUCT UPDATED");
+        setToast({ type: 'success', message: 'PRODUCT UPDATED' });
       } else {
         await API.post("/products", productData);
-        alert("PRODUCT ADDED");
+        setToast({ type: 'success', message: 'PRODUCT ADDED' });
       }
 
       closeModal();
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || "ERROR");
+      setToast({ type: 'error', message: err.response?.data?.message || "ERROR" });
     } finally {
       setSubmitting(false);
     }
@@ -205,9 +213,10 @@ function Admin() {
     try {
       await API.delete(`/products/${confirmAction.id}`);
       setConfirmAction(null);
+      setToast({ type: 'success', message: 'PRODUCT DELETED' });
       fetchData();
     } catch (err) {
-      alert("ERROR DELETING");
+      setToast({ type: 'error', message: 'ERROR DELETING' });
       setConfirmAction(null);
     }
   };
@@ -472,6 +481,21 @@ function Admin() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {toast && (
+        <div style={{
+          position: 'fixed', top: '20px', right: '20px', zIndex: 10000,
+          background: toast.type === 'success'? '#00ff00' : '#ff0000',
+          color: '#000', padding: '16px 24px', fontWeight: '900',
+          borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+        }}>
+          {toast.message}
+          <button onClick={() => setToast(null)} style={{
+            marginLeft: '12px', background: 'transparent', border: 'none',
+            fontWeight: '900', cursor: 'pointer', fontSize: '18px'
+          }}>×</button>
         </div>
       )}
 
