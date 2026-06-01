@@ -152,6 +152,18 @@ function Admin() {
     setShowModal(true);
   };
 
+  const handleDeleteOrder = async (id) => {
+  if (window.confirm("Delete this order? This cannot be undone!")) {
+    try {
+      await API.delete(`/orders/${id}`);
+      alert("ORDER DELETED");
+      fetchData(); // refresh list
+    } catch (err) {
+      alert(err.response?.data?.message || "ERROR DELETING ORDER");
+    }
+  }
+};
+
   const closeModal = () => {
     setShowModal(false);
     setEditingProduct(null);
@@ -305,37 +317,63 @@ function Admin() {
         )}
 
         {activeTab === "orders" && (
-          <div style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
-            <h2>ALL ORDERS ({orders.length})</h2>
+  <div style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
+    <h2>ALL ORDERS ({orders.length})</h2>
 
-            <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #333' }}>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>ORDER ID</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>CUSTOMER</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>TOTAL</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>ITEMS</th>
-                    <th style={{ textAlign: 'left', padding: '12px' }}>STATUS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((order) => (
-                    <tr key={order._id} style={{ borderBottom: '1px solid #222' }}>
-                      <td style={{ padding: '12px' }}>#{order._id.slice(-6)}</td>
-                      <td style={{ padding: '12px' }}>{order.user?.firstName} {order.user?.lastName}</td>
-                      <td style={{ padding: '12px' }}>₦{order.totalPrice?.toLocaleString()}</td>
-                      <td style={{ padding: '12px' }}>{order.orderItems?.length} items</td>
-                      <td style={{ padding: '12px', color: order.isPaid? '#00ff00' : '#ffaa00', fontWeight: '700' }}>
-                        {order.isPaid? 'Paid' : 'Processing'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+    <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
+        <thead>
+          <tr style={{ borderBottom: '2px solid #333' }}>
+            <th style={{ textAlign: 'left', padding: '12px' }}>ORDER ID</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>CUSTOMER</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>EMAIL</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>TOTAL</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>ITEMS</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>STATUS</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>DATE</th>
+            <th style={{ textAlign: 'left', padding: '12px' }}>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((order) => (
+            <tr key={order._id} style={{ borderBottom: '1px solid #222' }}>
+              <td style={{ padding: '12px' }}>#{order._id.slice(-6)}</td>
+              <td style={{ padding: '12px' }}>
+                {order.user?.firstName || order.shippingAddress?.fullName || "Guest"} 
+                {order.user?.lastName ? ` ${order.user.lastName}` : ""}
+              </td>
+              <td style={{ padding: '12px' }}>{order.user?.email || order.shippingAddress?.email || "-"}</td>
+              <td style={{ padding: '12px' }}>₦{order.totalPrice?.toLocaleString()}</td>
+              <td style={{ padding: '12px' }}>{order.orderItems?.length} items</td>
+              <td style={{ padding: '12px', color: order.isPaid? '#00ff00' : '#ffaa00', fontWeight: '700' }}>
+                {order.isPaid? 'Paid' : 'Processing'}
+              </td>
+              <td style={{ padding: '12px' }}>
+                {new Date(order.createdAt).toLocaleDateString()}
+              </td>
+              <td style={{ padding: '12px' }}>
+                <button 
+                  onClick={() => handleDeleteOrder(order._id)}
+                  style={{ 
+                    background: '#ff0000', 
+                    color: '#fff', 
+                    border: 'none', 
+                    padding: '8px 16px',
+                    fontWeight: '700', 
+                    cursor: 'pointer',
+                    borderRadius: '4px'
+                  }}
+                >
+                  DELETE
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
       </div>
 
       {showModal && (
