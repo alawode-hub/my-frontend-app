@@ -60,7 +60,7 @@ function Admin() {
       ]);
 
       const fixedProducts = productsRes.data.map(p => ({
-      ...p,
+     ...p,
         image: getFullImageUrl(p.image)
       }));
 
@@ -170,7 +170,7 @@ function Admin() {
 
     try {
       const productData = {
-      ...form,
+     ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -431,45 +431,44 @@ function Admin() {
       {confirmAction && confirmAction.type === 'delete' && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center',
+          background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center',
           justifyContent: 'center', zIndex: 9999
         }}>
           <div style={{
-            background: '#111',
-            border: '2px solid #ff0000',
+            background: '#000',
+            border: '1px solid #fff',
             padding: '2rem',
-            maxWidth: '400px',
+            maxWidth: '350px',
             width: '100%',
-            textAlign: 'center',
-            borderRadius: '8px'
+            textAlign: 'center'
           }}>
-            <h2 style={{ color: '#ff0000', marginBottom: '1rem', fontSize: '1.5rem', fontWeight: '900' }}>DELETE PRODUCT?</h2>
-            <p style={{ marginBottom: '2rem', color: '#ccc' }}>Delete "{confirmAction.name}"? This cannot be undone!</p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <p style={{ marginBottom: '2rem', fontSize: '16px', fontWeight: '600' }}>
+              Remove "{confirmAction.name}" from products?
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button onClick={confirmDelete}
                 style={{
-                  background: '#ff0000',
-                  color: '#fff',
+                  background: '#fff',
+                  color: '#000',
                   border: 'none',
-                  padding: '12px 24px',
+                  padding: '12px 32px',
                   fontWeight: '900',
                   cursor: 'pointer',
-                  flex: 1,
-                  borderRadius: '4px'
+                  fontSize: '14px'
                 }}>
-                YES, DELETE
+                YES
               </button>
               <button onClick={() => setConfirmAction(null)}
                 style={{
-                  background: 'transparent',
+                  background: '#000',
                   color: '#fff',
                   border: '1px solid #fff',
-                  padding: '12px 24px',
+                  padding: '12px 32px',
                   cursor: 'pointer',
-                  flex: 1,
-                  borderRadius: '4px'
+                  fontWeight: '900',
+                  fontSize: '14px'
                 }}>
-                CANCEL
+                NO
               </button>
             </div>
           </div>
