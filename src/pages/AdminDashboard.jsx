@@ -22,6 +22,10 @@ function Admin() {
   const [errors, setErrors] = useState({});
   const [editingProduct, setEditingProduct] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
+  const [orderFilter, setOrderFilter] = useState("all");
+
   const [form, setForm] = useState({
     name: "",
     price: "",
@@ -98,12 +102,10 @@ function Admin() {
     return Number(cleaned);
   };
 
-  // FULL IMAGE VALIDATION 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    //  ONLY IMAGES
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       toast.error("ONLY JPG, JPEG, PNG, WEBP IMAGES ALLOWED ❌");
@@ -112,7 +114,6 @@ function Admin() {
       return;
     }
 
-    // CHECK FILE SIZE 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       toast.error("IMAGE TOO LARGE. MAX 5MB ALLOWED ❌");
@@ -157,6 +158,20 @@ function Admin() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const openAddModal = () => {
+    setEditingProduct(null);
+    setForm({
+      name: "",
+      price: "",
+      image: "",
+      description: "",
+      countInStock: "",
+      category: ""
+    });
+    setErrors({});
+    setShowModal(true);
+  };
+
   const handleEdit = (product) => {
     setEditingProduct(product._id);
     setForm({
@@ -167,19 +182,12 @@ function Admin() {
       countInStock: product.countInStock,
       category: product.category || ""
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setShowModal(true);
   };
 
-  const cancelEdit = () => {
+  const closeModal = () => {
+    setShowModal(false);
     setEditingProduct(null);
-    setForm({
-      name: "",
-      price: "",
-      image: "",
-      description: "",
-      countInStock: "",
-      category: ""
-    });
     setErrors({});
   };
 
@@ -211,7 +219,7 @@ function Admin() {
         toast.success("PRODUCT ADDED SUCCESSFULLY 🔥");
       }
 
-      cancelEdit();
+      closeModal();
       fetchData();
     } catch (err) {
       toast.dismiss(toastId);
@@ -238,6 +246,27 @@ function Admin() {
       }
     });
   };
+
+  const handleMarkDelivered = async (orderId) => {
+    try {
+      await API.put(`/orders/${orderId}/deliver`);
+      toast.success("ORDER MARKED AS DELIVERED ✅");
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "ERROR UPDATING ORDER");
+    }
+  };
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.category.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredOrders = orders.filter(order => {
+    if (orderFilter === "processing") return!order.isDelivered;
+    if (orderFilter === "delivered") return order.isDelivered;
+    return true;
+  });
 
   if (loading) return (
     <div className="page-dark">
@@ -351,139 +380,220 @@ function Admin() {
         </div>
 
         {activeTab === "products" && (
-          <>
-            <div className="admin-box" style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px', maxWidth: '700px', marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 style={{ margin: 0 }}>{editingProduct? 'EDIT PRODUCT' : 'ADD NEW PRODUCT'}</h2>
-                {editingProduct && (
-                  <button onClick={cancelEdit} style={{ background: 'transparent', border: '1px solid #fff', color: '#fff', padding: '8px 16px', cursor: 'pointer' }}>
-                    CANCEL
-                  </button>
-                )}
-              </div>
-
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div>
-                  <input name="name" placeholder="Product Name" value={form.name} onChange={handleChange} style={inputStyle('name')} />
-                  {errors.name && <p style={{ color: '#ff0000', fontSize: '0.8rem' }}>{errors.name}</p>}
-                </div>
-
-                <div>
-                  <select name="category" value={form.category} onChange={handleChange} style={inputStyle('category')}>
-                    <option value="">Select Category</option>
-                    <option value="TOPS">TOPS</option>
-                    <option value="JEANS">JEANS</option>
-                    <option value="CAPS">CAPS</option>
-                    <option value="SNEAKERS">SNEAKERS</option>
-                    <option value="HOODIES">HOODIES</option>
-                    <option value="SHORTJEANS">SHORTJEANS</option>
-                  </select>
-                  {errors.category && <p style={{ color: '#ff0000', fontSize: '0.8rem' }}>{errors.category}</p>}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <input name="price" type="text" placeholder="Price e.g. 59000 or 50k" value={form.price} onChange={handleChange} style={inputStyle('price')} />
-                    {errors.price && <p style={{ color: '#ff0000', fontSize: '0.8rem' }}>{errors.price}</p>}
-                  </div>
-                  <div>
-                    <input name="countInStock" type="number" placeholder="Stock Quantity" value={form.countInStock} onChange={handleChange} style={inputStyle('countInStock')} />
-                    {errors.countInStock && <p style={{ color: '#ff0000', fontSize: '0.8rem' }}>{errors.countInStock}</p>}
-                  </div>
-                </div>
-
-                <div>
-                  <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} rows="3"
-                    style={{ background: '#1a1a1a', border: 'none', borderBottom: errors.description? '2px solid #ff0000' : '2px solid #333', padding: '12px 0', color: '#fff', width: '100%' }} />
-                  {errors.description && <p style={{ color: '#ff0000', fontSize: '0.8rem' }}>{errors.description}</p>}
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#777' }}>Product Image</label>
-                  <input
-                    type="file"
-                    onChange={uploadFileHandler}
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    disabled={uploading}
-                    style={{ background: '#1a1a1a', border: 'none', borderBottom: errors.image? '2px solid #ff0000' : '2px solid #333', padding: '12px 0', color: '#fff', width: '100%' }}
-                  />
-                  {uploading && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.5rem', color: '#777' }}>
-                      <ClipLoader size={16} color="#FF0000" />
-                      <span>Uploading image...</span>
-                    </div>
-                  )}
-                  {errors.image && <p style={{ color: '#ff0000', fontSize: '0.8rem' }}>{errors.image}</p>}
-                  {form.image &&!uploading && (
-                    <div style={{ marginTop: '1rem' }}>
-                      <img src={form.image} alt="preview" style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '4px' }} />
-                    </div>
-                  )}
-                </div>
-
-                <button type="submit" disabled={submitting || uploading}
-                  style={{ background: submitting || uploading? '#333' : '#fff', color: submitting || uploading? '#777' : '#000', border: 'none', padding: '14px', fontWeight: '900', cursor: submitting || uploading? 'not-allowed' : 'pointer' }}>
-                  {submitting? (editingProduct? 'UPDATING...' : 'ADDING...') : uploading? 'WAIT FOR IMAGE UPLOAD...' : editingProduct? 'UPDATE PRODUCT' : 'ADD PRODUCT'}
-                </button>
-              </form>
+          <div className="admin-box" style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0 }}>ALL PRODUCTS ({filteredProducts.length})</h2>
+              <button onClick={openAddModal} style={{ background: '#fff', color: '#000', border: 'none', padding: '12px 24px', fontWeight: '900', cursor: 'pointer' }}>
+                + ADD PRODUCT
+              </button>
             </div>
 
-            <div className="admin-box" style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
-              <h2 style={{ marginBottom: '1.5rem' }}>ALL PRODUCTS ({products.length})</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {products.map((product) => (
-                  <div key={product._id} style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', background: '#1a1a1a', borderRadius: '4px' }}>
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
-                      onError={(e) => e.target.style.display = 'none'}
-                    />
-                    <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: '0 0 0.5rem 0' }}>{product.name}</h4>
-                      <p style={{ margin: 0, color: '#777' }}>₦{product.price.toLocaleString()}</p>
-                      <p style={{ margin: 0, color: '#777', fontSize: '0.9rem' }}>
-                        Category: {product.category} | Stock: {product.countInStock}
-                      </p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => handleEdit(product)} style={{ background: '#00ff00', color: '#000', border: 'none', padding: '8px 16px', fontWeight: '700', cursor: 'pointer' }}>EDIT</button>
-                      <button onClick={() => handleDelete(product._id)} style={{ background: '#ff0000', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: '700', cursor: 'pointer' }}>DELETE</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <input
+              type="text"
+              placeholder="Search by name or category..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ background: '#1a1a1a', border: '1px solid #333', padding: '12px', width: '100%', marginBottom: '1.5rem', color: '#fff', outline: 'none' }}
+            />
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #333' }}>
+                    <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>IMAGE</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>NAME</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>PRICE</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>CATEGORY</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>STOCK</th>
+                    <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.length === 0? (
+                    <tr>
+                      <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#777' }}>No products found</td>
+                    </tr>
+                  ) : (
+                    filteredProducts.map((product) => (
+                      <tr key={product._id} style={{ borderBottom: '1px solid #222' }}>
+                        <td style={{ padding: '12px' }}>
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                            onError={(e) => e.target.style.display = 'none'}
+                          />
+                        </td>
+                        <td style={{ padding: '12px' }}>{product.name}</td>
+                        <td style={{ padding: '12px' }}>₦{product.price.toLocaleString()}</td>
+                        <td style={{ padding: '12px' }}>{product.category}</td>
+                        <td style={{ padding: '12px' }}>{product.countInStock}</td>
+                        <td style={{ padding: '12px' }}>
+                          <button onClick={() => handleEdit(product)} style={{ background: '#00ff00', color: '#000', border: 'none', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', marginRight: '5px' }}>EDIT</button>
+                          <button onClick={() => handleDelete(product._id)} style={{ background: '#ff0000', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: '700', cursor: 'pointer' }}>DELETE</button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-          </>
+          </div>
         )}
 
         {activeTab === "orders" && (
           <div className="admin-box" style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>ALL ORDERS ({orders.length})</h2>
-            {orders.length === 0? (
-              <p style={{ color: "#777" }}>No orders yet</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0 }}>ALL ORDERS ({filteredOrders.length})</h2>
+              <select
+                value={orderFilter}
+                onChange={(e) => setOrderFilter(e.target.value)}
+                style={{ background: '#1a1a1a', border: '1px solid #333', padding: '10px', color: '#fff', outline: 'none' }}
+              >
+                <option value="all">All Orders</option>
+                <option value="processing">Processing</option>
+                <option value="delivered">Delivered</option>
+              </select>
+            </div>
+
+            {filteredOrders.length === 0? (
+              <p style={{ color: "#777" }}>No orders found</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {orders.map((order) => (
-                  <div key={order._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: '#1a1a1a', borderRadius: '4px' }}>
-                    <div>
-                      <h4 style={{ margin: '0 0 0.5rem 0' }}>Order #{order._id.slice(-6)}</h4>
-                      <p style={{ margin: 0, color: '#777' }}>Customer: {order.user?.firstName || "Guest"}</p>
-                      <p style={{ margin: 0, color: order.isDelivered? '#00ff00' : '#ff0000', fontSize: '0.9rem' }}>
-                        Status: {order.isDelivered? 'Delivered' : 'Processing'}
-                      </p>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <h4 style={{ margin: '0 0 0.5rem 0' }}>₦{order.totalPrice?.toLocaleString()}</h4>
-                      <p style={{ color: "#777", margin: 0 }}>{order.orderItems?.length} items</p>
-                    </div>
-                  </div>
-                ))}
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #333' }}>
+                      <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>ORDER ID</th>
+                      <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>CUSTOMER</th>
+                      <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>ITEMS</th>
+                      <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>TOTAL</th>
+                      <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>STATUS</th>
+                      <th style={{ textAlign: 'left', padding: '12px', fontWeight: '700' }}>ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredOrders.map((order) => (
+                      <tr key={order._id} style={{ borderBottom: '1px solid #222' }}>
+                        <td style={{ padding: '12px' }}>#{order._id.slice(-6)}</td>
+                        <td style={{ padding: '12px' }}>{order.user?.firstName} {order.user?.lastName}</td>
+                        <td style={{ padding: '12px' }}>{order.orderItems?.length} items</td>
+                        <td style={{ padding: '12px' }}>₦{order.totalPrice?.toLocaleString()}</td>
+                        <td style={{ padding: '12px' }}>
+                          <span style={{
+                            color: order.isDelivered? '#00ff00' : '#ffaa00',
+                            fontWeight: '700'
+                          }}>
+                            {order.isDelivered? 'Delivered' : 'Processing'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          {!order.isDelivered && (
+                            <button
+                              onClick={() => handleMarkDelivered(order._id)}
+                              style={{ background: '#00ff00', color: '#000', border: 'none', padding: '8px 16px', fontWeight: '700', cursor: 'pointer' }}
+                            >
+                              MARK DELIVERED
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
         )}
       </div>
+
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.9)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 9998,
+          padding: '2rem'
+        }}>
+          <div style={{
+            background: '#111', border: '2px solid #333', padding: '2rem',
+            maxWidth: '700px', width: '100%', maxHeight: '90vh', overflowY: 'auto', borderRadius: '8px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0 }}>{editingProduct? 'EDIT PRODUCT' : 'ADD NEW PRODUCT'}</h2>
+              <button onClick={closeModal} style={{ background: 'transparent', border: '1px solid #fff', color: '#fff', padding: '8px 16px', cursor: 'pointer' }}>
+                CLOSE
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <input name="name" placeholder="Product Name" value={form.name} onChange={handleChange} style={inputStyle('name')} />
+                {errors.name && <p style={{ color: '#ff0000', fontSize: '0.8rem', marginTop: '5px' }}>{errors.name}</p>}
+              </div>
+
+              <div>
+                <select name="category" value={form.category} onChange={handleChange} style={inputStyle('category')}>
+                  <option value="">Select Category</option>
+                  <option value="TOPS">TOPS</option>
+                  <option value="JEANS">JEANS</option>
+                  <option value="CAPS">CAPS</option>
+                  <option value="SNEAKERS">SNEAKERS</option>
+                  <option value="HOODIES">HOODIES</option>
+                  <option value="SHORTJEANS">SHORTJEANS</option>
+                </select>
+                {errors.category && <p style={{ color: '#ff0000', fontSize: '0.8rem', marginTop: '5px' }}>{errors.category}</p>}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <input name="price" type="text" placeholder="Price e.g. 59000 or 50k" value={form.price} onChange={handleChange} style={inputStyle('price')} />
+                  {errors.price && <p style={{ color: '#ff0000', fontSize: '0.8rem', marginTop: '5px' }}>{errors.price}</p>}
+                </div>
+                <div>
+                  <input name="countInStock" type="number" placeholder="Stock Quantity" value={form.countInStock} onChange={handleChange} style={inputStyle('countInStock')} />
+                  {errors.countInStock && <p style={{ color: '#ff0000', fontSize: '0.8rem', marginTop: '5px' }}>{errors.countInStock}</p>}
+                </div>
+              </div>
+
+              <div>
+                <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} rows="3"
+                  style={{ background: '#1a1a1a', border: 'none', borderBottom: errors.description? '2px solid #ff0000' : '2px solid #333', padding: '12px 0', color: '#fff', width: '100%' }} />
+                {errors.description && <p style={{ color: '#ff0000', fontSize: '0.8rem', marginTop: '5px' }}>{errors.description}</p>}
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#777' }}>Product Image</label>
+                <input
+                  type="file"
+                  onChange={uploadFileHandler}
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  disabled={uploading}
+                  style={{ background: '#1a1a1a', border: 'none', borderBottom: errors.image? '2px solid #ff0000' : '2px solid #333', padding: '12px 0', color: '#fff', width: '100%' }}
+                />
+                {uploading && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.5rem', color: '#777' }}>
+                    <ClipLoader size={16} color="#FF0000" />
+                    <span>Uploading image...</span>
+                  </div>
+                )}
+                {errors.image && <p style={{ color: '#ff0000', fontSize: '0.8rem', marginTop: '5px' }}>{errors.image}</p>}
+                {form.image &&!uploading && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <img src={form.image} alt="preview" style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '4px' }} />
+                  </div>
+                )}
+              </div>
+
+              <button type="submit" disabled={submitting || uploading}
+                style={{ background: submitting || uploading? '#333' : '#fff', color: submitting || uploading? '#777' : '#000', border: 'none', padding: '14px', fontWeight: '900', cursor: submitting || uploading? 'not-allowed' : 'pointer' }}>
+                {submitting? (editingProduct? 'UPDATING...' : 'ADDING...') : uploading? 'WAIT FOR IMAGE UPLOAD...' : editingProduct? 'UPDATE PRODUCT' : 'ADD PRODUCT'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
