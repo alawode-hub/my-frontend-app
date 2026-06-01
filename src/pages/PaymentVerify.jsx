@@ -21,23 +21,23 @@ const PaymentVerify = () => {
       }
 
       try {
-        const user = JSON.parse(localStorage.getItem("user"));
+        // Get token with fallback
+        const userStr = localStorage.getItem("user");
+        const user = userStr? JSON.parse(userStr) : null;
         const token = user?.token;
 
-        const { data } = await API.get(`/payment/verify/${reference}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        console.log("VERIFY TOKEN EXISTS:",!!token);
+
+        // Send request - headers optional now since route is public
+        const headers = token? { Authorization: `Bearer ${token}` } : {};
+        const { data } = await API.get(`/payment/verify/${reference}`, { headers });
 
         if (data.success) {
           console.log("BEFORE CLEAR:", localStorage.getItem("cartItems"));
 
-          // NUCLEAR: Clear everything first
+          // NUCLEAR CLEAR - wipe everything
           localStorage.clear();
-
-          // Then clear Redux
           dispatch(clearCart());
-
-          // Set empty to prevent rehydration
           localStorage.setItem("cartItems", "[]");
           localStorage.setItem("shippingAddress", "{}");
 
@@ -45,7 +45,7 @@ const PaymentVerify = () => {
 
           toast.success("PAYMENT SUCCESSFUL! Cart cleared 🔥");
 
-          // Force reload ONCE to kill Redux state completely
+          // Full reload to kill old Redux state
           setTimeout(() => {
             window.location.href = "/orders";
           }, 800);
@@ -54,7 +54,7 @@ const PaymentVerify = () => {
           navigate("/cart", { replace: true });
         }
       } catch (err) {
-        console.log("PAYMENT VERIFY ERROR:", err);
+        console.log("PAYMENT VERIFY ERROR:", err.response?.status, err.response?.data);
         toast.error("PAYMENT VERIFICATION FAILED");
         navigate("/cart", { replace: true });
       }
