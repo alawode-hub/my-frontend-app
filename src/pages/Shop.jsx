@@ -84,7 +84,7 @@ function Shop() {
         if (activeCategory!== "ALL PRODUCTS") {
           params.append("category", activeCategory);
         }
-        if (debouncedSearch) params.append("keyword", debouncedSearch);
+        if (debouncedSearch) params.append("search", debouncedSearch);
 
         const url = `${API_URL}/api/products${params.toString()? `?${params.toString()}` : ""}`;
         const { data } = await axios.get(url);
