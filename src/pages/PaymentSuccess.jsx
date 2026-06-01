@@ -1,9 +1,19 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { clearCart } from "../redux/cartSlice";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const reference = searchParams.get('reference');
+
+  useEffect(() => {
+    // Backup clear - in case user refresh success page
+    dispatch(clearCart());
+    localStorage.removeItem("cartItems");
+  }, [dispatch]);
 
   return (
     <div style={{
