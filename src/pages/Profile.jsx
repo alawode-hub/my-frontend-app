@@ -426,24 +426,22 @@ const Profile = () => {
               </div>
 
               {/* EMAIL  */}
-<div style={{ marginBottom: "1.5rem" }}>
-  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "1px", marginBottom: "0.5rem", color: "#999" }}>
-    EMAIL ADDRESS
-  </label>
-  <div style={{
-    padding: "1rem",
-    background: "#111",
-    border: "1px solid #333",
-    color: "#fff",
-    fontSize: "0.9rem",
-    borderRadius: "0"
-  }}>
-    {formData.email}
-  </div>
-  <small style={{ color: "#666", fontSize: "0.75rem", marginTop: "6px", display: "block", letterSpacing: "0.5px" }}>
-    Email cannot be changed. Contact support if you need to update it.
-  </small>
-</div>
+        <div style={{ marginBottom: "1.5rem" }}>
+       <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "1px", marginBottom: "0.5rem", color: "#999" }}>
+            EMAIL ADDRESS
+      </label>
+      <div style={{
+       padding: "1rem",
+       background: "#111",
+       border: "1px solid #333",
+       color: "#fff",
+       fontSize: "0.9rem",
+       borderRadius: "0"
+       }}>
+       {formData.email}
+       </div>
+  
+      </div>
  
               
               <button
