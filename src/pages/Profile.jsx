@@ -10,7 +10,23 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URI;
 
-// Helper to fix image URLs
+// PASSWORD VALIDATION HELPER - SAME AS REGISTER
+const validatePassword = (password) => {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[@$!%*?&]/.test(password);
+
+  if (password.length < minLength) return "Password must be at least 8 characters";
+  if (!hasUpperCase) return "Password must contain 1 uppercase letter";
+  if (!hasLowerCase) return "Password must contain 1 lowercase letter";
+  if (!hasNumber) return "Password must contain 1 number";
+  if (!hasSpecialChar) return "Password must contain 1 special character @$!%*?&";
+
+  return "";
+};
+
 const getFullImageUrl = (path) => {
   if (!path) return "/placeholder.jpg";
   if (path.startsWith("http")) return path;
@@ -18,7 +34,6 @@ const getFullImageUrl = (path) => {
   return `${API_URL}/${path}`;
 };
 
-// ORDERS LIST COMPONENT
 const OrdersList = ({ user }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +97,6 @@ const OrdersList = ({ user }) => {
           marginBottom: "2rem",
           background: "#111"
         }}>
-          {/* ORDER HEADER */}
           <div style={{
             display: "flex",
             justifyContent: "space-between",
@@ -112,7 +126,6 @@ const OrdersList = ({ user }) => {
             </div>
           </div>
 
-          {/* ORDER ITEMS */}
           <div style={{ marginBottom: "1.5rem" }}>
             <p style={{
               fontSize: "0.75rem",
@@ -159,7 +172,6 @@ const OrdersList = ({ user }) => {
             ))}
           </div>
 
-          {/* ORDER TOTAL */}
           <div style={{
             borderTop: "2px solid #333",
             paddingTop: "1rem",
@@ -180,7 +192,6 @@ const OrdersList = ({ user }) => {
   );
 };
 
-// MAIN PROFILE COMPONENT
 const Profile = () => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -195,7 +206,6 @@ const Profile = () => {
     confirmPassword: ""
   });
 
-  // EYE TOGGLE STATES
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -244,17 +254,41 @@ const Profile = () => {
     }
   };
 
+  // FIXED PASSWORD HANDLER WITH VALIDATION
   const handleChangePassword = async (e) => {
     e.preventDefault();
+
     if (formData.newPassword!== formData.confirmPassword) {
       toast.error("PASSWORDS DON'T MATCH", {
         style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
       });
       return;
     }
+
+    // STRONG PASSWORD VALIDATION
+    const passwordError = validatePassword(formData.newPassword);
+    if (passwordError) {
+      toast.error(passwordError.toUpperCase(), {
+        style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
+      });
+      return;
+    }
+
+    if (!formData.currentPassword) {
+      toast.error("ENTER CURRENT PASSWORD", {
+        style: { background: '#FF0000', color: '#fff', fontWeight: '700', letterSpacing: '1px' }
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // await dispatch(changePassword({ currentPassword: formData.currentPassword, newPassword: formData.newPassword })).unwrap();
+      // UNCOMMENT THIS WHEN YOU HAVE changePassword ACTION IN authSlice
+      // await dispatch(changePassword({
+      // currentPassword: formData.currentPassword,
+      // newPassword: formData.newPassword
+      // })).unwrap();
+
       toast.success("PASSWORD CHANGED", {
         style: { background: '#111', color: '#fff', border: '1px solid #FF0000', fontWeight: '700', letterSpacing: '1px' }
       });
@@ -291,7 +325,6 @@ const Profile = () => {
 
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem 2rem" }}>
 
-        {/* HEADER */}
         <h1 style={{
           fontSize: "2rem",
           fontWeight: "900",
@@ -307,7 +340,6 @@ const Profile = () => {
           marginBottom: "2.5rem"
         }}></div>
 
-        {/* TABS */}
         <div style={{
           display: "flex",
           gap: "2rem",
@@ -336,12 +368,9 @@ const Profile = () => {
           ))}
         </div>
 
-        {/* PROFILE DETAILS TAB */}
         {activeTab === "details" && (
           <div style={{ maxWidth: "600px" }}>
             <form onSubmit={handleUpdateDetails}>
-
-              {/* FIRST NAME */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -369,7 +398,6 @@ const Profile = () => {
                 />
               </div>
 
-              {/* LAST NAME */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -397,7 +425,6 @@ const Profile = () => {
                 />
               </div>
 
-              {/* EMAIL */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -451,19 +478,16 @@ const Profile = () => {
           </div>
         )}
 
-        {/* ORDERS TAB - NOW WORKING */}
         {activeTab === "orders" && (
           <div style={{ maxWidth: "1000px" }}>
             <OrdersList user={user} />
           </div>
         )}
 
-        {/* PASSWORD TAB WITH EYE ICONS */}
         {activeTab === "password" && (
           <div style={{ maxWidth: "600px" }}>
             <form onSubmit={handleChangePassword}>
 
-              {/* CURRENT PASSWORD */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -513,7 +537,6 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* NEW PASSWORD */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -561,9 +584,11 @@ const Profile = () => {
                     <EyeIcon show={showNewPassword} />
                   </button>
                 </div>
+                <small style={{color: '#777', fontSize: '0.75rem', display: 'block', marginTop: '5px'}}>
+                  Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special @$!%*?&
+                </small>
               </div>
 
-              {/* CONFIRM NEW PASSWORD */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",

@@ -6,6 +6,23 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
 
+// PASSWORD VALIDATION 
+const validatePassword = (password) => {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[@$!%*?&]/.test(password);
+
+  if (password.length < minLength) return "Password must be at least 8 characters";
+  if (!hasUpperCase) return "Password must contain 1 uppercase letter";
+  if (!hasLowerCase) return "Password must contain 1 lowercase letter"; 
+  if (!hasNumber) return "Password must contain 1 number";
+  if (!hasSpecialChar) return "Password must contain 1 special character @$!%*?&";
+  
+  return "";
+};
+
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -24,6 +41,14 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // VALIDATE PASSWORD BEFORE SUBMIT
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      toast.error(passwordError.toUpperCase());
+      return;
+    }
+    
     dispatch(registerUser(formData));
   };
 
@@ -94,6 +119,9 @@ const Register = () => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
+          <small style={{color: '#777', fontSize: '0.75rem', display: 'block', marginTop: '5px'}}>
+            Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special @$!%*?&
+          </small>
           <button 
             type="submit" 
             className="btn-white" 
@@ -103,7 +131,8 @@ const Register = () => {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center', 
-              gap: '10px' 
+              gap: '10px',
+              marginTop: '15px'
             }}
           >
             {loading ? (

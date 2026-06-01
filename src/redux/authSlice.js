@@ -50,6 +50,30 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
+// NEW: CHANGE PASSWORD ACTION
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async ({ currentPassword, newPassword }, { rejectWithValue, getState }) => {
+    try {
+      const { auth } = getState();
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.user.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `${API_URL}/api/users/password`,
+        { currentPassword, newPassword },
+        config
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -118,6 +142,21 @@ const authSlice = createSlice({
         localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // CHANGE PASSWORD CASES
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "PASSWORD CHANGED SUCCESSFULLY";
+      })
+      .addCase(changePassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
