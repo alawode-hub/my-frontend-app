@@ -425,7 +425,7 @@ const Profile = () => {
                 />
               </div>
 
-              {/* EMAIL - AMAZON STYLE */}
+              {/* EMAIL  */}
 <div style={{ marginBottom: "1.5rem" }}>
   <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "1px", marginBottom: "0.5rem", color: "#999" }}>
     EMAIL ADDRESS
