@@ -60,7 +60,7 @@ function Admin() {
       ]);
 
       const fixedProducts = productsRes.data.map(p => ({
-       ...p,
+      ...p,
         image: getFullImageUrl(p.image)
       }));
 
@@ -170,7 +170,7 @@ function Admin() {
 
     try {
       const productData = {
-       ...form,
+      ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -192,15 +192,23 @@ function Admin() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Delete this product?")) {
-      try {
-        await API.delete(`/products/${id}`);
-        alert("DELETED");
-        fetchData();
-      } catch (err) {
-        alert("ERROR DELETING");
-      }
+  const handleDelete = (id) => {
+    const product = products.find(p => p._id === id);
+    setConfirmAction({
+      type: 'delete',
+      id: id,
+      name: product?.name
+    });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await API.delete(`/products/${confirmAction.id}`);
+      setConfirmAction(null);
+      fetchData();
+    } catch (err) {
+      alert("ERROR DELETING");
+      setConfirmAction(null);
     }
   };
 
@@ -416,6 +424,54 @@ function Admin() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {confirmAction && confirmAction.type === 'delete' && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', zIndex: 9999
+        }}>
+          <div style={{
+            background: '#111',
+            border: '2px solid #ff0000',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '100%',
+            textAlign: 'center',
+            borderRadius: '8px'
+          }}>
+            <h2 style={{ color: '#ff0000', marginBottom: '1rem', fontSize: '1.5rem', fontWeight: '900' }}>DELETE PRODUCT?</h2>
+            <p style={{ marginBottom: '2rem', color: '#ccc' }}>Delete "{confirmAction.name}"? This cannot be undone!</p>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button onClick={confirmDelete}
+                style={{
+                  background: '#ff0000',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 24px',
+                  fontWeight: '900',
+                  cursor: 'pointer',
+                  flex: 1,
+                  borderRadius: '4px'
+                }}>
+                YES, DELETE
+              </button>
+              <button onClick={() => setConfirmAction(null)}
+                style={{
+                  background: 'transparent',
+                  color: '#fff',
+                  border: '1px solid #fff',
+                  padding: '12px 24px',
+                  cursor: 'pointer',
+                  flex: 1,
+                  borderRadius: '4px'
+                }}>
+                CANCEL
+              </button>
+            </div>
           </div>
         </div>
       )}
