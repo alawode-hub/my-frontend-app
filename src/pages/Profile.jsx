@@ -3,14 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { updateUserProfile } from "../redux/authSlice";
+import { updateUserProfile, changePassword } from "../redux/authSlice";
 import toast, { Toaster } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URI;
 
-// PASSWORD VALIDATION HELPER - SAME AS REGISTER
+// PASSWORD VALIDATION 
 const validatePassword = (password) => {
   const minLength = 8;
   const hasUpperCase = /[A-Z]/.test(password);
@@ -238,8 +238,8 @@ const Profile = () => {
     try {
       await dispatch(updateUserProfile({
         firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email
+        lastName: formData.lastName
+        
       })).unwrap();
 
       toast.success("PROFILE UPDATED", {
@@ -254,7 +254,7 @@ const Profile = () => {
     }
   };
 
-  // FIXED PASSWORD HANDLER WITH VALIDATION
+  // password handler
   const handleChangePassword = async (e) => {
     e.preventDefault();
 
@@ -283,11 +283,11 @@ const Profile = () => {
 
     setLoading(true);
     try {
-      // UNCOMMENT THIS WHEN YOU HAVE changePassword ACTION IN authSlice
-      // await dispatch(changePassword({
-      // currentPassword: formData.currentPassword,
-      // newPassword: formData.newPassword
-      // })).unwrap();
+      
+      await dispatch(changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      })).unwrap();
 
       toast.success("PASSWORD CHANGED", {
         style: { background: '#111', color: '#fff', border: '1px solid #FF0000', fontWeight: '700', letterSpacing: '1px' }
@@ -425,6 +425,7 @@ const Profile = () => {
                 />
               </div>
 
+              {/* EMAIL - READ ONLY */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -434,20 +435,21 @@ const Profile = () => {
                   marginBottom: "0.5rem",
                   color: "#999"
                 }}>
-                  EMAIL
+                  EMAIL - CANNOT BE CHANGED
                 </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
-                  onChange={handleChange}
+                  readOnly
                   style={{
                     width: "100%",
-                    background: "#111",
-                    border: "1px solid #333",
-                    color: "#fff",
+                    background: "#0a0a0a",
+                    border: "1px solid #222",
+                    color: "#666",
                     padding: "1rem",
-                    fontSize: "0.9rem"
+                    fontSize: "0.9rem",
+                    cursor: "not-allowed"
                   }}
                 />
               </div>
