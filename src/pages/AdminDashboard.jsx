@@ -152,18 +152,6 @@ function Admin() {
     setShowModal(true);
   };
 
-  const handleDeleteOrder = async (id) => {
-  if (window.confirm("Delete this order? This cannot be undone!")) {
-    try {
-      await API.delete(`/orders/${id}`);
-      alert("ORDER DELETED");
-      fetchData(); // refresh list
-    } catch (err) {
-      alert(err.response?.data?.message || "ERROR DELETING ORDER");
-    }
-  }
-};
-
   const closeModal = () => {
     setShowModal(false);
     setEditingProduct(null);
@@ -247,15 +235,19 @@ function Admin() {
 
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #333' }}>
           <button onClick={() => setActiveTab("products")}
-            style={{ background: activeTab === "products"? '#fff' : 'transparent',
-            color: activeTab === "products"? '#000' : '#fff', border: 'none', padding: '12px 24px',
-            fontWeight: '700', cursor: 'pointer' }}>
+            style={{
+              background: activeTab === "products"? '#fff' : 'transparent',
+              color: activeTab === "products"? '#000' : '#fff', border: 'none', padding: '12px 24px',
+              fontWeight: '700', cursor: 'pointer'
+            }}>
             PRODUCTS
           </button>
           <button onClick={() => setActiveTab("orders")}
-            style={{ background: activeTab === "orders"? '#fff' : 'transparent',
-            color: activeTab === "orders"? '#000' : '#fff', border: 'none', padding: '12px 24px',
-            fontWeight: '700', cursor: 'pointer' }}>
+            style={{
+              background: activeTab === "orders"? '#fff' : 'transparent',
+              color: activeTab === "orders"? '#000' : '#fff', border: 'none', padding: '12px 24px',
+              fontWeight: '700', cursor: 'pointer'
+            }}>
             ORDERS
           </button>
         </div>
@@ -265,16 +257,20 @@ function Admin() {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <h2>ALL PRODUCTS ({filteredProducts.length})</h2>
               <button onClick={openAddModal}
-                style={{ background: '#fff', color: '#000', border: 'none', padding: '12px 24px',
-                fontWeight: '900', cursor: 'pointer' }}>
+                style={{
+                  background: '#fff', color: '#000', border: 'none', padding: '12px 24px',
+                  fontWeight: '900', cursor: 'pointer'
+                }}>
                 + ADD PRODUCT
               </button>
             </div>
 
             <input type="text" placeholder="Search..."
               value={search} onChange={(e) => setSearch(e.target.value)}
-              style={{ background: '#1a1a1a', border: '1px solid #333', padding: '12px',
-              width: '100%', marginBottom: '1.5rem', color: '#fff', outline: 'none' }}
+              style={{
+                background: '#1a1a1a', border: '1px solid #333', padding: '12px',
+                width: '100%', marginBottom: '1.5rem', color: '#fff', outline: 'none'
+              }}
             />
 
             <div style={{ overflowX: 'auto' }}>
@@ -302,11 +298,15 @@ function Admin() {
                       <td style={{ padding: '12px' }}>{product.countInStock}</td>
                       <td style={{ padding: '12px' }}>
                         <button onClick={() => handleEdit(product)}
-                          style={{ background: '#00ff00', color: '#000', border: 'none', padding: '8px 16px',
-                          fontWeight: '700', cursor: 'pointer', marginRight: '5px' }}>EDIT</button>
+                          style={{
+                            background: '#00ff00', color: '#000', border: 'none', padding: '8px 16px',
+                            fontWeight: '700', cursor: 'pointer', marginRight: '5px'
+                          }}>EDIT</button>
                         <button onClick={() => handleDelete(product._id)}
-                          style={{ background: '#ff0000', color: '#fff', border: 'none', padding: '8px 16px',
-                          fontWeight: '700', cursor: 'pointer' }}>DELETE</button>
+                          style={{
+                            background: '#ff0000', color: '#fff', border: 'none', padding: '8px 16px',
+                            fontWeight: '700', cursor: 'pointer'
+                          }}>DELETE</button>
                       </td>
                     </tr>
                   ))}
@@ -317,63 +317,46 @@ function Admin() {
         )}
 
         {activeTab === "orders" && (
-  <div style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
-    <h2>ALL ORDERS ({orders.length})</h2>
+          <div style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
+            <h2>ALL ORDERS ({orders.length})</h2>
 
-    <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
-        <thead>
-          <tr style={{ borderBottom: '2px solid #333' }}>
-            <th style={{ textAlign: 'left', padding: '12px' }}>ORDER ID</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>CUSTOMER</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>EMAIL</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>TOTAL</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>ITEMS</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>STATUS</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>DATE</th>
-            <th style={{ textAlign: 'left', padding: '12px' }}>ACTION</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order._id} style={{ borderBottom: '1px solid #222' }}>
-              <td style={{ padding: '12px' }}>#{order._id.slice(-6)}</td>
-              <td style={{ padding: '12px' }}>
-                {order.user?.firstName || order.shippingAddress?.fullName || "Guest"} 
-                {order.user?.lastName ? ` ${order.user.lastName}` : ""}
-              </td>
-              <td style={{ padding: '12px' }}>{order.user?.email || order.shippingAddress?.email || "-"}</td>
-              <td style={{ padding: '12px' }}>₦{order.totalPrice?.toLocaleString()}</td>
-              <td style={{ padding: '12px' }}>{order.orderItems?.length} items</td>
-              <td style={{ padding: '12px', color: order.isPaid? '#00ff00' : '#ffaa00', fontWeight: '700' }}>
-                {order.isPaid? 'Paid' : 'Processing'}
-              </td>
-              <td style={{ padding: '12px' }}>
-                {new Date(order.createdAt).toLocaleDateString()}
-              </td>
-              <td style={{ padding: '12px' }}>
-                <button 
-                  onClick={() => handleDeleteOrder(order._id)}
-                  style={{ 
-                    background: '#ff0000', 
-                    color: '#fff', 
-                    border: 'none', 
-                    padding: '8px 16px',
-                    fontWeight: '700', 
-                    cursor: 'pointer',
-                    borderRadius: '4px'
-                  }}
-                >
-                  DELETE
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
+            <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #333' }}>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>ORDER ID</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>CUSTOMER</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>EMAIL</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>TOTAL</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>ITEMS</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>STATUS</th>
+                    <th style={{ textAlign: 'left', padding: '12px' }}>DATE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order._id} style={{ borderBottom: '1px solid #222' }}>
+                      <td style={{ padding: '12px' }}>#{order._id.slice(-6)}</td>
+                      <td style={{ padding: '12px' }}>
+                        {order.user?.firstName || order.shippingAddress?.fullName || "Guest"}
+                        {order.user?.lastName? ` ${order.user.lastName}` : ""}
+                      </td>
+                      <td style={{ padding: '12px' }}>{order.user?.email || order.shippingAddress?.email || "-"}</td>
+                      <td style={{ padding: '12px' }}>₦{order.totalPrice?.toLocaleString()}</td>
+                      <td style={{ padding: '12px' }}>{order.orderItems?.length} items</td>
+                      <td style={{ padding: '12px', color: order.isPaid? '#00ff00' : '#ffaa00', fontWeight: '700' }}>
+                        {order.isPaid? 'Paid' : 'Processing'}
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {showModal && (
@@ -382,8 +365,10 @@ function Admin() {
           background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center',
           justifyContent: 'center', zIndex: 9998
         }}>
-          <div style={{ background: '#111', border: '2px solid #333', padding: '2rem',
-            maxWidth: '600px', width: '100%' }}>
+          <div style={{
+            background: '#111', border: '2px solid #333', padding: '2rem',
+            maxWidth: '600px', width: '100%'
+          }}>
             <h2>{editingProduct? 'EDIT' : 'ADD'} PRODUCT</h2>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
@@ -416,13 +401,17 @@ function Admin() {
 
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <button type="submit" disabled={submitting || uploading}
-                  style={{ background: '#fff', color: '#000', border: 'none', padding: '12px 24px',
-                  fontWeight: '900', cursor: 'pointer', flex: 1 }}>
+                  style={{
+                    background: '#fff', color: '#000', border: 'none', padding: '12px 24px',
+                    fontWeight: '900', cursor: 'pointer', flex: 1
+                  }}>
                   {submitting? 'SAVING...' : editingProduct? 'UPDATE' : 'ADD'}
                 </button>
                 <button type="button" onClick={closeModal}
-                  style={{ background: 'transparent', color: '#fff', border: '1px solid #fff', padding: '12px 24px',
-                  cursor: 'pointer' }}>
+                  style={{
+                    background: 'transparent', color: '#fff', border: '1px solid #fff', padding: '12px 24px',
+                    cursor: 'pointer'
+                  }}>
                   CLOSE
                 </button>
               </div>
