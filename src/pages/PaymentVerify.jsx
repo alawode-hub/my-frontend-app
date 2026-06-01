@@ -21,40 +21,52 @@ const PaymentVerify = () => {
       }
 
       try {
-        // Get token with fallback
         const userStr = localStorage.getItem("user");
-        const user = userStr? JSON.parse(userStr) : null;
+        const user = userStr ? JSON.parse(userStr) : null;
         const token = user?.token;
 
-        console.log("VERIFY TOKEN EXISTS:",!!token);
+        console.log("VERIFY TOKEN EXISTS:", !!token);
 
-        // Send request - headers optional now since route is public
-        const headers = token? { Authorization: `Bearer ${token}` } : {};
-        const { data } = await API.get(`/payment/verify/${reference}`, { headers });
+        const headers = token
+          ? { Authorization: `Bearer ${token}` }
+          : {};
+
+        const { data } = await API.get(
+          `/payment/verify/${reference}`,
+          { headers }
+        );
+
+        console.log("VERIFY RESPONSE:", data);
 
         if (data.success) {
-          console.log("BEFORE CLEAR:", localStorage.getItem("cartItems"));
+          console.log(
+            "BEFORE CLEAR:",
+            localStorage.getItem("cartItems")
+          );
 
-          // NUCLEAR CLEAR - wipe everything
-          localStorage.clear();
           dispatch(clearCart());
-          localStorage.setItem("cartItems", "[]");
-          localStorage.setItem("shippingAddress", "{}");
 
-          console.log("AFTER CLEAR:", localStorage.getItem("cartItems"));
+          console.log(
+            "AFTER CLEAR:",
+            localStorage.getItem("cartItems")
+          );
 
           toast.success("PAYMENT SUCCESSFUL! Cart cleared 🔥");
 
-          // Full reload to kill old Redux state
           setTimeout(() => {
-            window.location.href = "/orders";
+            navigate("/orders", { replace: true });
           }, 800);
         } else {
           toast.error("PAYMENT FAILED");
           navigate("/cart", { replace: true });
         }
       } catch (err) {
-        console.log("PAYMENT VERIFY ERROR:", err.response?.status, err.response?.data);
+        console.log(
+          "PAYMENT VERIFY ERROR:",
+          err.response?.status,
+          err.response?.data
+        );
+
         toast.error("PAYMENT VERIFICATION FAILED");
         navigate("/cart", { replace: true });
       }
@@ -64,18 +76,22 @@ const PaymentVerify = () => {
   }, [reference, dispatch, navigate]);
 
   return (
-    <div style={{
-      background: "#0a0a0a",
-      color: "#fff",
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "1rem"
-    }}>
+    <div
+      style={{
+        background: "#0a0a0a",
+        color: "#fff",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "1rem",
+      }}
+    >
       <ClipLoader color="#FF0000" size={50} />
-      <p style={{ letterSpacing: "1px" }}>VERIFYING PAYMENT...</p>
+      <p style={{ letterSpacing: "1px" }}>
+        VERIFYING PAYMENT...
+      </p>
     </div>
   );
 };
