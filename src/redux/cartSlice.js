@@ -63,13 +63,11 @@ const cartSlice = createSlice({
     },
 
     clearCart: (state) => {
-  console.log("CLEARING CART NOW");
   state.cartItems = [];
   state.shippingAddress = {};
-  localStorage.clear();
-  localStorage.setItem("cartItems", "[]");
-  localStorage.setItem("shippingAddress", "{}");
-  console.log("CART CLEARED:", localStorage.getItem("cartItems"));
+
+  localStorage.removeItem("cartItems");
+  localStorage.removeItem("shippingAddress");
 },
 
 
