@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Use same key for all users to avoid ID mismatch after Paystack redirect
 const CART_KEY = "cartItems";
 const SHIPPING_KEY = "shippingAddress";
 
@@ -48,6 +49,14 @@ const cartSlice = createSlice({
       localStorage.setItem(CART_KEY, JSON.stringify(state.cartItems));
     },
 
+    updateQty: (state, action) => {
+      const { id, qty } = action.payload;
+      state.cartItems = state.cartItems.map((item) =>
+        item._id === id? {...item, qty } : item
+      );
+      localStorage.setItem(CART_KEY, JSON.stringify(state.cartItems));
+    },
+
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
       localStorage.setItem(SHIPPING_KEY, JSON.stringify(action.payload));
@@ -58,11 +67,11 @@ const cartSlice = createSlice({
       state.cartItems = [];
       state.shippingAddress = {};
 
-      // Remove ALL cart-related keys to be sure
+      // Remove main keys
       localStorage.removeItem(CART_KEY);
       localStorage.removeItem(SHIPPING_KEY);
 
-      // Nuclear option: remove anything with cart/shipping
+      // Nuclear: remove any key with cart/shipping to avoid old userId keys
       Object.keys(localStorage).forEach(key => {
         if (key.includes("cart") || key.includes("shipping")) {
           localStorage.removeItem(key);
@@ -81,5 +90,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, saveShippingAddress, clearCart, resetCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQty, saveShippingAddress, clearCart, resetCart } = cartSlice.actions;
 export default cartSlice.reducer;
