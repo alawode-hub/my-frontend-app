@@ -1,74 +1,45 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import API from "../services/api";
-import { clearCart } from "../redux/cartSlice";
+import { useDispatch } from "react-redux";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { clearCart } from "../redux/cartSlice"; 
 import toast from "react-hot-toast";
-import { ClipLoader } from "react-spinners";
 
 const PaymentVerify = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const reference = searchParams.get("reference");
 
   useEffect(() => {
     const verifyPayment = async () => {
-      const reference = searchParams.get("reference");
-
-      if (!reference) {
-        toast.error("INVALID PAYMENT REFERENCE");
-        navigate("/cart", { replace: true });
-        return;
-      }
+      if (!reference) return;
 
       try {
-        const token = user?.token;
+        const res = await API.get(`/payment/verify/${reference}`);
 
-        const { data } = await API.get(`/payment/verify/${reference}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (data.success) {
-          // Clear cart BEFORE navigate
+        if (res.data.success) {
+          // Clear cart immediately
           dispatch(clearCart());
-          localStorage.removeItem("cartItems"); // extra safety
-          localStorage.removeItem(`shippingAddress_${user?._id}`);
 
-          toast.success("PAYMENT SUCCESSFUL 🔥");
-
+          // Double clear after 500ms
           setTimeout(() => {
-            navigate("/payment-success", { replace: true });
-          }, 1000);
-        } else {
-          toast.error("PAYMENT FAILED");
-          navigate("/cart", { replace: true });
+            dispatch(clearCart());
+            localStorage.removeItem("cartItems");
+          }, 500);
+
+          toast.success("Payment successful! Cart cleared.");
+          navigate("/orders");
         }
       } catch (err) {
-        console.log("PAYMENT VERIFY ERROR:", err);
-        toast.error("PAYMENT VERIFICATION FAILED");
-        navigate("/cart", { replace: true });
+        toast.error("Payment verification failed");
+        navigate("/checkout");
       }
     };
 
     verifyPayment();
-  }, [searchParams, navigate, dispatch, user]);
+  }, [reference, dispatch, navigate]);
 
-  return (
-    <div style={{
-      background: "#0a0a0a",
-      color: "#fff",
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "1rem"
-    }}>
-      <ClipLoader color="#FF0000" size={50} />
-      <p style={{ letterSpacing: "1px" }}>VERIFYING PAYMENT...</p>
-    </div>
-  );
+  return <div>Verifying payment...</div>;
 };
 
 export default PaymentVerify;
