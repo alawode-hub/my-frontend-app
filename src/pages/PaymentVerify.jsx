@@ -29,21 +29,26 @@ const PaymentVerify = () => {
         });
 
         if (data.success) {
-          // Clear cart immediately
+          console.log("BEFORE CLEAR:", localStorage.getItem("cartItems"));
+
+          // NUCLEAR: Clear everything first
+          localStorage.clear();
+
+          // Then clear Redux
           dispatch(clearCart());
 
-          // Double clear after 500ms to handle async Redux
-          setTimeout(() => {
-            dispatch(clearCart());
-            localStorage.removeItem("cartItems");
-            localStorage.removeItem("shippingAddress");
-          }, 500);
+          // Set empty to prevent rehydration
+          localStorage.setItem("cartItems", "[]");
+          localStorage.setItem("shippingAddress", "{}");
+
+          console.log("AFTER CLEAR:", localStorage.getItem("cartItems"));
 
           toast.success("PAYMENT SUCCESSFUL! Cart cleared 🔥");
 
+          // Force reload ONCE to kill Redux state completely
           setTimeout(() => {
-            navigate("/orders", { replace: true });
-          }, 1000);
+            window.location.href = "/orders";
+          }, 800);
         } else {
           toast.error("PAYMENT FAILED");
           navigate("/cart", { replace: true });
