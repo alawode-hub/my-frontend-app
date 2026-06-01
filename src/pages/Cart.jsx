@@ -143,7 +143,9 @@ const Cart = () => {
           </button>
         </div>
       ))}
-      <button onClick={handleClearCart} style={{ color: "#FF0000", background: "none", border: "none", cursor: "pointer", fontWeight: "700", marginTop: "1rem" }}>CLEAR CART</button>
+      <div className="cart-items-footer">
+  <button onClick={handleClearCart} className="cart-clear-btn">CLEAR CART</button>
+</div>
     </div>
 
     <div className="cart-order-summary">

@@ -305,7 +305,7 @@ a {
 /* CART LAYOUT - FIXED RESPONSIVE */
 .cart-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* PC: Cart left, Summary right */
+  grid-template-columns: 2fr 1fr; 
   gap: 3rem;
   align-items: start;
   max-width: 1400px;
@@ -320,7 +320,7 @@ a {
 
 .cart-item-grid {
   display: grid;
-  grid-template-columns: 80px 1fr auto 40px; /* Image | Info | Price | Trash */
+  grid-template-columns: 80px 1fr auto 40px; 
   gap: 1.5rem;
   align-items: flex-start;
   border-bottom: 1px solid #222;
@@ -351,6 +351,29 @@ a {
   gap: 0.8rem;
   align-items: center;
   margin-top: 0.8rem;
+}
+
+.cart-items-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #222;
+}
+
+.cart-clear-btn {
+  color: #FF0000;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+  padding: 0;
+}
+
+.cart-clear-btn:hover {
+  opacity: 0.7;
 }
 
 .cart-qty-controls button {
