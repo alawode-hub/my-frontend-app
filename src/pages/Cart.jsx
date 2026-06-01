@@ -97,75 +97,70 @@ const Cart = () => {
         )}
 
         {cartItems.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "4rem 0" }}>
-            <p style={{ fontSize: "1.2rem", color: "#666", marginBottom: "2rem" }}>Your cart is empty</p>
-            <Link to="/shop" style={{ background: "#FF0000", color: "#fff", padding: "1rem 2rem", textDecoration: "none", fontWeight: "700" }}>CONTINUE SHOPPING</Link>
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
-            <div>
-              {cartItems.map((item) => (
-                <div key={item._id} style={{ display: "flex", gap: "1rem", marginBottom: "2rem", borderBottom: "1px solid #222", paddingBottom: "2rem", alignItems: "flex-start" }}>
-                  <img
-                    src={getFullImageUrl(item.image)}
-                    alt={item.name}
-                    style={{ width: "80px", height: "100px", objectFit: "cover" }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <h3>{item.name}</h3>
-                    <p style={{ color: "#999" }}>₦{Number(item.price).toLocaleString()}</p>
-                    <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginTop: "1rem" }}>
-                      <button 
-                        onClick={() => handleUpdateQty(item._id, item.qty - 1)} 
-                        disabled={item.qty <= 1}
-                        style={{ background: "#222", border: "none", color: "#fff", width: "30px", height: "30px", cursor: "pointer" }}
-                      >
-                        -
-                      </button>
-                      <span>{item.qty}</span>
-                      <button 
-                        onClick={() => handleUpdateQty(item._id, item.qty + 1)}
-                        style={{ background: "#222", border: "none", color: "#fff", width: "30px", height: "30px", cursor: "pointer" }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem" }}>
-                    <p style={{ fontWeight: "900", margin: 0 }}>₦{(item.qty * item.price).toLocaleString()}</p>
-                    <button 
-                      onClick={() => handleRemove(item._id)} 
-                      style={{ 
-                        background: "none", 
-                        border: "none", 
-                        color: "#FF0000", 
-                        cursor: "pointer", 
-                        fontSize: "18px",
-                        padding: "4px"
-                      }}
-                      title="Remove item"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button onClick={handleClearCart} style={{ color: "#FF0000", background: "none", border: "none", cursor: "pointer", fontWeight: "700" }}>CLEAR CART</button>
-            </div>
-
-            <div style={{ background: "#111", padding: "2rem", height: "fit-content" }}>
-              <h2>ORDER SUMMARY</h2>
-              <div style={{ display: "flex", justifyContent: "space-between", margin: "1rem 0" }}>
-                <span>Total</span>
-                <span>₦{total.toLocaleString()}</span>
-              </div>
-              <button onClick={handleCheckout} disabled={loading} style={{ width: "100%", background: "#FF0000", color: "#fff", padding: "1rem", border: "none", cursor: "pointer" }}>
-                {loading ? <ClipLoader size={20} color="#fff" /> : "CHECKOUT"}
+  <div style={{ textAlign: "center", padding: "4rem 0" }}>
+    <p style={{ fontSize: "1.2rem", color: "#666", marginBottom: "2rem" }}>Your cart is empty</p>
+    <Link to="/shop" style={{ background: "#FF0000", color: "#fff", padding: "1rem 2rem", textDecoration: "none", fontWeight: "700" }}>CONTINUE SHOPPING</Link>
+  </div>
+) : (
+  <div className="cart-layout">
+    <div className="cart-items">
+      {cartItems.map((item) => (
+        <div key={item._id} className="cart-item-grid">
+          <img
+            src={getFullImageUrl(item.image)}
+            alt={item.name}
+          />
+          
+          <div className="cart-item-info">
+            <h3>{item.name}</h3>
+            <p>₦{Number(item.price).toLocaleString()}</p>
+            <div className="cart-qty-controls">
+              <button 
+                onClick={() => handleUpdateQty(item._id, item.qty - 1)} 
+                disabled={item.qty <= 1}
+              >
+                -
+              </button>
+              <span>{item.qty}</span>
+              <button 
+                onClick={() => handleUpdateQty(item._id, item.qty + 1)}
+              >
+                +
               </button>
             </div>
           </div>
-        )}
+          
+          <div className="cart-price-col">
+            <span>Subtotal: ₦{(item.qty * item.price).toLocaleString()}</span>
+          </div>
+          
+          <button 
+            onClick={() => handleRemove(item._id)} 
+            className="cart-remove-btn"
+            title="Remove item"
+          >
+            <FaTrash />
+          </button>
+        </div>
+      ))}
+      <button onClick={handleClearCart} style={{ color: "#FF0000", background: "none", border: "none", cursor: "pointer", fontWeight: "700", marginTop: "1rem" }}>CLEAR CART</button>
+    </div>
+
+    <div className="cart-order-summary">
+      <h2>ORDER SUMMARY</h2>
+      <div style={{ display: "flex", justifyContent: "space-between", margin: "1rem 0" }}>
+        <span>Total</span>
+        <span>₦{total.toLocaleString()}</span>
+      </div>
+      <button onClick={handleCheckout} disabled={loading} style={{ width: "100%", background: "#FF0000", color: "#fff", padding: "1rem", border: "none", cursor: "pointer" }}>
+        {loading ? <ClipLoader size={20} color="#fff" /> : "CHECKOUT"}
+      </button>
+    </div>
+  </div>
+)}
+
+      
+
       </div>
       <Footer />
     </div>
