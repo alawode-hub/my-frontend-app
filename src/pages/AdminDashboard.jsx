@@ -91,15 +91,14 @@ function Admin() {
   };
 
   const parsePrice = (priceString) => {
-    if (!priceString) return 0;
-    let cleaned = priceString.toString().lowerCase().replace(/[$,\s]/g, '');
-    if (cleaned.includes('k')) {
-      cleaned = cleaned.replace('k', '');
-      return Number(cleaned) * 1000;
-    }
-    return Number(cleaned);
-  };
-
+  if (!priceString) return 0;
+  let cleaned = priceString.toString().toLowerCase().replace(/[$,\s]/g, '');
+  if (cleaned.includes('k')) {
+    cleaned = cleaned.replace('k', '');
+    return Number(cleaned) * 1000;
+  }
+  return Number(cleaned);
+};
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -114,6 +113,7 @@ function Admin() {
       setForm({...form, image: imageUrl });
       setUploading(false);
     } catch (error) {
+      console.log(err);
       setToast({ type: 'error', message: 'IMAGE UPLOAD FAILED' });
       setUploading(false);
       e.target.value = "";
