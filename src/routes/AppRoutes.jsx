@@ -12,6 +12,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import AdminDashboard from "../pages/AdminDashboard";
 import AddProduct from "../admin/AddProduct";
+import SellProduct from "../pages/SellProduct";
 
 function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/shop" element={<Shop />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/sell" element={<SellProduct />} /> 
         <Route path="/checkout" element={<Checkout />} />
       </Route>
 
