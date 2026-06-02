@@ -13,6 +13,7 @@ function Admin() {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
+  const [pendingProducts, setPendingProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState("products");
   const [loading, setLoading] = useState(true);
@@ -47,6 +48,12 @@ function Admin() {
   }, [user, navigate]);
 
   useEffect(() => {
+    if (activeTab === "pending") {
+      fetchPendingProducts();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
       return () => clearTimeout(timer);
@@ -68,7 +75,7 @@ function Admin() {
       ]);
 
       const fixedProducts = productsRes.data.map(p => ({
-    ...p,
+       ...p,
         image: getFullImageUrl(p.image)
       }));
 
@@ -82,6 +89,34 @@ function Admin() {
     }
   };
 
+  const fetchPendingProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get("/products/pending");
+      const fixedPending = res.data.map(p => ({
+       ...p,
+        image: getFullImageUrl(p.image)
+      }));
+      setPendingProducts(fixedPending);
+    } catch (err) {
+      console.error(err);
+      setToast({ type: 'error', message: 'FAILED TO LOAD PENDING' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprove = async (id, status) => {
+    try {
+      await API.put(`/products/${id}/approve`, { status });
+      setToast({ type: 'success', message: `PRODUCT ${status.toUpperCase()}` });
+      fetchPendingProducts();
+      if (status === 'approved') fetchData();
+    } catch (err) {
+      setToast({ type: 'error', message: 'ERROR' });
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({...form, [name]: value });
@@ -91,14 +126,15 @@ function Admin() {
   };
 
   const parsePrice = (priceString) => {
-  if (!priceString) return 0;
-  let cleaned = priceString.toString().toLowerCase().replace(/[$,\s]/g, '');
-  if (cleaned.includes('k')) {
-    cleaned = cleaned.replace('k', '');
-    return Number(cleaned) * 1000;
-  }
-  return Number(cleaned);
-};
+    if (!priceString) return 0;
+    let cleaned = priceString.toString().toLowerCase().replace(/[$,\s]/g, '');
+    if (cleaned.includes('k')) {
+      cleaned = cleaned.replace('k', '');
+      return Number(cleaned) * 1000;
+    }
+    return Number(cleaned);
+  };
+
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -113,7 +149,7 @@ function Admin() {
       setForm({...form, image: imageUrl });
       setUploading(false);
     } catch (error) {
-      console.log(err);
+      console.log(error);
       setToast({ type: 'error', message: 'IMAGE UPLOAD FAILED' });
       setUploading(false);
       e.target.value = "";
@@ -178,7 +214,7 @@ function Admin() {
 
     try {
       const productData = {
-    ...form,
+       ...form,
         price: parsePrice(form.price),
         countInStock: Number(form.countInStock)
       };
@@ -245,6 +281,10 @@ function Admin() {
             <p style={{ color: '#777' }}>TOTAL PRODUCTS</p>
           </div>
           <div style={{ background: '#111', border: '1px solid #333', padding: '1.5rem', borderRadius: '8px' }}>
+            <h3 style={{ fontSize: '2rem', margin: 0 }}>{pendingProducts.length}</h3>
+            <p style={{ color: '#777' }}>PENDING APPROVAL</p>
+          </div>
+          <div style={{ background: '#111', border: '1px solid #333', padding: '1.5rem', borderRadius: '8px' }}>
             <h3 style={{ fontSize: '2rem', margin: 0 }}>{orders.length}</h3>
             <p style={{ color: '#777' }}>TOTAL ORDERS</p>
           </div>
@@ -258,6 +298,14 @@ function Admin() {
               fontWeight: '700', cursor: 'pointer'
             }}>
             PRODUCTS
+          </button>
+          <button onClick={() => setActiveTab("pending")}
+            style={{
+              background: activeTab === "pending"? '#fff' : 'transparent',
+              color: activeTab === "pending"? '#000' : '#fff', border: 'none', padding: '12px 24px',
+              fontWeight: '700', cursor: 'pointer'
+            }}>
+            PENDING APPROVALS
           </button>
           <button onClick={() => setActiveTab("orders")}
             style={{
@@ -330,6 +378,60 @@ function Admin() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {activeTab === "pending" && (
+          <div style={{ background: '#111', border: '1px solid #333', padding: '2rem', borderRadius: '8px' }}>
+            <h2>PENDING PRODUCTS ({pendingProducts.length})</h2>
+
+            {pendingProducts.length === 0? (
+              <p style={{ color: '#666', marginTop: '2rem', textAlign: 'center' }}>NO PENDING PRODUCTS</p>
+            ) : (
+              <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #333' }}>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>IMAGE</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>NAME</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>PRICE</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>CATEGORY</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>SUBMITTED BY</th>
+                      <th style={{ textAlign: 'left', padding: '12px' }}>ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingProducts.map((product) => (
+                      <tr key={product._id} style={{ borderBottom: '1px solid #222' }}>
+                        <td style={{ padding: '12px' }}>
+                          <img src={product.image} alt={product.name} style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                        </td>
+                        <td style={{ padding: '12px' }}>{product.name}</td>
+                        <td style={{ padding: '12px' }}>₦{product.price.toLocaleString()}</td>
+                        <td style={{ padding: '12px' }}>{product.category}</td>
+                        <td style={{ padding: '12px' }}>{product.submittedBy?.email || 'Unknown'}</td>
+                        <td style={{ padding: '12px' }}>
+                          <button onClick={() => handleApprove(product._id, 'approved')}
+                            style={{
+                              background: '#00ff00', color: '#000', border: 'none', padding: '8px 16px',
+                              fontWeight: '700', cursor: 'pointer', marginRight: '5px'
+                            }}>
+                            APPROVE
+                          </button>
+                          <button onClick={() => handleApprove(product._id, 'rejected')}
+                            style={{
+                              background: '#ff0000', color: '#fff', border: 'none', padding: '8px 16px',
+                              fontWeight: '700', cursor: 'pointer'
+                            }}>
+                            REJECT
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
