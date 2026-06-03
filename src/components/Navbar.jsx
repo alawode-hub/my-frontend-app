@@ -85,7 +85,7 @@ const Navbar = () => {
             whiteSpace: "nowrap"
           }}
         >
-          MK COLLECTIVES
+          DripWithMK
         </Link>
 
         {/* RIGHT: Profile + Cart */}
