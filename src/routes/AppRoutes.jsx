@@ -28,7 +28,7 @@ function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/shop" element={<Shop />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/sell" element={<SellProduct />} /> 
+        <Route path="/sell-product" element={<SellProduct />} /> 
         <Route path="/checkout" element={<Checkout />} />
       </Route>
 
