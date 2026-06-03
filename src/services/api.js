@@ -6,18 +6,28 @@ const API = axios.create({
 
 // Auto-attach token to every request
 API.interceptors.request.use((config) => {
-  console.log("INTERCEPTOR HIT:", config.url);
-  const raw = localStorage.getItem("user");
-  console.log("RAW user:", raw);
+  const token = localStorage.getItem("token"); // GET TOKEN DIRECTLY
   
-  const userInfo = raw ? JSON.parse(raw) : null;
-  console.log("TOKEN:", userInfo?.token);
-  
-  if (userInfo?.token) {
-    config.headers.Authorization = `Bearer ${userInfo.token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
+
+// Handle 401 errors - auto logout
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default API;
