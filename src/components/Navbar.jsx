@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../redux/authSlice";
-import { FaShoppingCart, FaBars, FaTimes, FaUser } from "react-icons/fa";
+import { FaShoppingCart, FaBars, FaTimes, FaUser, FaPlus } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,207 +16,64 @@ const Navbar = () => {
   const handleLogout = () => {
     dispatch(logoutUser());
     setMenuOpen(false);
-    navigate("/");
+    navigate("/login");
   };
 
   const closeMenu = () => setMenuOpen(false);
 
-  const handleShopClick = (e) => {
-    e.preventDefault();
-    closeMenu();
-    if (!user) {
-      navigate('/login');
-    } else {
-      navigate('/shop');
-    }
-  };
-
   return (
     <>
-      <nav style={{
-        background: "#000",
-        color: "#fff",
-        height: "56px",
-        width: "100%",
-        maxWidth: "100vw",
-        padding: "0 16px",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderBottom: "1px solid #1a1a1a",
-        boxSizing: "border-box",
-        overflowX: "hidden"
-      }}>
-
+      <nav style={styles.nav}>
         {/* Hamburger */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "#fff",
-            cursor: "pointer",
-            padding: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0
-          }}
-        >
-          <FaBars size={18} />
+        <button style={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
         </button>
 
-        {/* CENTER LOGO */}
-        <Link
-          to="/"
-          onClick={closeMenu}
-          style={{
-            color: "#fff",
-            textDecoration: "none",
-            fontSize: "16px",
-            fontWeight: "700",
-            letterSpacing: "2px",
-            textTransform: "uppercase",
-            whiteSpace: "nowrap"
-          }}
-        >
+        {/* Logo */}
+        <Link to="/" onClick={closeMenu} style={styles.logo}>
           DripWithMK
         </Link>
 
-        {/* RIGHT: Profile + Cart */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-          {user && (
-            <Link
-              to="/profile"
-              onClick={closeMenu}
-              style={{
-                color: "#fff",
-                textDecoration: "none",
-                fontSize: "11px",
-                fontWeight: "600",
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px"
-              }}
-            >
-              <FaUser size={14} />
-              <span className="nav-username">HI, {user.name?.split(" ")[0].toUpperCase()}</span>
+        {/* Right Icons */}
+        <div style={styles.rightIcons}>
+          {user ? (
+            <Link to="/profile" onClick={closeMenu} style={styles.iconLink}>
+              <FaUser size={18} />
+            </Link>
+          ) : (
+            <Link to="/login" onClick={closeMenu} style={styles.iconLink}>
+              LOGIN
             </Link>
           )}
 
-          <Link
-            to="/cart"
-            onClick={closeMenu}
-            style={{
-              color: "#fff",
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "8px"
-            }}
-          >
+          <Link to="/cart" onClick={closeMenu} style={styles.iconLink}>
             <FaShoppingCart size={18} />
-            {cartCount > 0 && (
-              <span style={{
-                position: "absolute",
-                top: "2px",
-                right: "2px",
-                background: "#FF0000",
-                color: "#fff",
-                borderRadius: "50%",
-                minWidth: "16px",
-                height: "16px",
-                fontSize: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "700",
-                padding: "0 4px"
-              }}>
-                {cartCount}
-              </span>
-            )}
+            {cartCount > 0 && <span style={styles.badge}>{cartCount}</span>}
           </Link>
         </div>
       </nav>
 
-      {/* OVERLAY */}
-      {menuOpen && (
-        <div
-          onClick={closeMenu}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.6)",
-            zIndex: 9998
-          }}
-        />
-      )}
-
-      {/* SLIDE DRAWER */}
-      <div style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        height: "100vh",
-        width: "280px",
-        maxWidth: "80vw",
-        background: "#000",
-        zIndex: 10000,
-        transform: menuOpen? "translateX(0)" : "translateX(-100%)",
-        transition: "transform 0.25s ease",
-        borderRight: "1px solid #1a1a1a",
-        overflowY: "auto"
-      }}>
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "16px"
-        }}>
-          <button
-            onClick={closeMenu}
-            style={{
-              background: "transparent",
-              border: "2px solid #FF0000",
-              color: "#fff",
-              cursor: "pointer",
-              padding: "6px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "32px",
-              height: "32px"
-            }}
-          >
-            <FaTimes size={14} />
-          </button>
+      {/* Slide Drawer */}
+      <div style={{...styles.drawer, transform: menuOpen ? "translateX(0)" : "translateX(-100%)"}}>
+        <div style={styles.drawerHeader}>
+          <h3 style={{margin: 0, fontSize: "18px", letterSpacing: "1px"}}>MENU</h3>
+          <button onClick={closeMenu} style={styles.closeBtn}><FaTimes /></button>
         </div>
 
-        <div style={{
-          padding: "0 32px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "32px",
-          marginTop: "16px"
-        }}>
+        <div style={styles.drawerLinks}>
           <Link to="/" onClick={closeMenu} style={navLinkStyle}>HOME</Link>
-          <Link to="/shop" onClick={handleShopClick} style={navLinkStyle}>SHOP</Link>
+          <Link to="/shop" onClick={closeMenu} style={navLinkStyle}>SHOP</Link>
+          
+          {user && (
+            <Link to="/sell-product" onClick={closeMenu} style={sellLinkStyle}>
+              <FaPlus size={14} /> SELL PRODUCT
+            </Link>
+          )}
 
-          {user? (
+          {user ? (
             <>
               <Link to="/profile" onClick={closeMenu} style={navLinkStyle}>PROFILE</Link>
-              {user.role === "admin" && (
-                <Link to="/admin" onClick={closeMenu} style={navLinkStyle}>ADMIN</Link>
-              )}
+              <Link to="/orders" onClick={closeMenu} style={navLinkStyle}>MY ORDERS</Link>
               <button onClick={handleLogout} style={logoutBtnStyle}>LOGOUT</button>
             </>
           ) : (
@@ -227,6 +84,9 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Overlay */}
+      {menuOpen && <div style={styles.overlay} onClick={closeMenu} />}
     </>
   );
 };
@@ -234,23 +94,146 @@ const Navbar = () => {
 const navLinkStyle = {
   color: "#fff",
   textDecoration: "none",
-  fontSize: "13px",
-  fontWeight: "400",
-  textTransform: "uppercase",
-  lineHeight: "1"
+  fontSize: "14px",
+  fontWeight: "500",
+  letterSpacing: "1px",
+  padding: "12px 0",
+  borderBottom: "1px solid #1a1a1a",
+  display: "block",
+  textTransform: "uppercase"
+};
+
+const sellLinkStyle = {
+  ...navLinkStyle,
+  color: "#FF0000",
+  fontWeight: "700",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px"
 };
 
 const logoutBtnStyle = {
   background: "transparent",
   border: "none",
   color: "#FF0000",
+  fontSize: "14px",
+  fontWeight: "500",
+  letterSpacing: "1px",
+  padding: "12px 0",
   textAlign: "left",
-  fontSize: "13px",
-  fontWeight: "400",
-  textTransform: "uppercase",
   cursor: "pointer",
-  padding: 0,
-  lineHeight: "1"
+  textTransform: "uppercase",
+  borderBottom: "1px solid #1a1a1a"
+};
+
+const styles = {
+  nav: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "56px",
+    background: "#000",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 16px",
+    zIndex: 1000,
+    borderBottom: "1px solid #1a1a1a"
+  },
+  hamburger: {
+    background: "transparent",
+    border: "none",
+    color: "#fff",
+    cursor: "pointer",
+    padding: "8px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  logo: {
+    color: "#fff",
+    textDecoration: "none",
+    fontSize: "18px",
+    fontWeight: "700",
+    letterSpacing: "2px",
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-50%)"
+  },
+  rightIcons: {
+    display: "flex",
+    alignItems: "center",
+    gap: "16px"
+  },
+  iconLink: {
+    color: "#fff",
+    textDecoration: "none",
+    fontSize: "12px",
+    fontWeight: "500",
+    letterSpacing: "1px",
+    position: "relative",
+    display: "flex",
+    alignItems: "center"
+  },
+  badge: {
+    position: "absolute",
+    top: "-6px",
+    right: "-8px",
+    background: "#FF0000",
+    color: "#fff",
+    borderRadius: "50%",
+    width: "16px",
+    height: "16px",
+    fontSize: "9px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: "700"
+  },
+  drawer: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "280px",
+    height: "100vh",
+    background: "#0a0a0a",
+    zIndex: 1001,
+    transition: "transform 0.3s ease",
+    borderRight: "1px solid #1a1a1a"
+  },
+  drawerHeader: {
+    height: "56px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 16px",
+    borderBottom: "1px solid #1a1a1a",
+    color: "#fff"
+  },
+  closeBtn: {
+    background: "transparent",
+    border: "none",
+    color: "#fff",
+    cursor: "pointer",
+    padding: "8px",
+    display: "flex"
+  },
+  drawerLinks: {
+    padding: "16px 24px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0"
+  },
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100vh",
+    background: "rgba(0,0,0,0.7)",
+    zIndex: 999
+  }
 };
 
 export default Navbar;
