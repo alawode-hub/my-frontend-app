@@ -8,6 +8,7 @@ import Cart from "./pages/Cart";
 import Admin from "./pages/AdminDashboard";
 import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
+import SellProduct from "./pages/SellProduct"; // ← ADDED THIS
 import "./index.css";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Profile from "./pages/Profile";
@@ -58,6 +59,7 @@ function App() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/order" element={<Order />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/sell-product" element={<SellProduct />} /> {/* ← ADDED THIS */}
         </Route>
 
         {/* ADMIN ONLY ROUTE */}
